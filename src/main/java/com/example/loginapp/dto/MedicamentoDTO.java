@@ -10,14 +10,12 @@ public class MedicamentoDTO {
 	private String nome;
     private String dosagem;
     
-    // Frequencia
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataInicio;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataTermino;
     private int vezesPorDia;
     
-    // Bula
     private String nomeComercial;
     private String principioAtivo;
     private String concentracao;
@@ -25,7 +23,6 @@ public class MedicamentoDTO {
     private String apresentacao;
     private String fabricante;
     
-    // Instrucoes
     private List<String> instrucoes;
     
     private String tipo;
@@ -34,7 +31,6 @@ public class MedicamentoDTO {
     public MedicamentoDTO() {
     }
 
-    // Getters e Setters
     public String getNome() {
         return nome;
     }

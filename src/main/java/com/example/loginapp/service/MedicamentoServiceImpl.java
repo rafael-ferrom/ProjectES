@@ -37,18 +37,14 @@ public class MedicamentoServiceImpl implements MedicamentoService {
 
 		User user = userOpt.get();
 
-		// Criar objeto Frequencia
 		Frequencia frequencia = new Frequencia(dto.getDataInicio(), dto.getDataTermino(), dto.getVezesPorDia());
 
-		// Criar objeto Bula
 		Bula bula = new Bula(dto.getNomeComercial(), dto.getPrincipioAtivo(), dto.getConcentracao(),
 				dto.getFormaFarmaceutica(), dto.getApresentacao(), dto.getFabricante());
 
-		// Criar o medicamento com os novos objetos
 		Medicamento medicamento = new Medicamento(dto.getNome(), dto.getDosagem(), frequencia, bula, dto.getTipo(),
 				user);
 
-		// Adicionar as instruções
 		if (dto.getInstrucoes() != null && !dto.getInstrucoes().isEmpty()) {
 			for (String instrucaoTexto : dto.getInstrucoes()) {
 				medicamento.adicionarInstrucao(instrucaoTexto);
