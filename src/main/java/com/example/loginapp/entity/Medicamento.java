@@ -3,6 +3,8 @@ package com.example.loginapp.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,6 +37,7 @@ public class Medicamento {
     private Bula bula;
 
     @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference // Lado "gerenciado" da referência
     private List<Instrucao> instrucoes = new ArrayList<>();
 
     private String tipo; // Ex: "comprimido", "líquido", "injeção"

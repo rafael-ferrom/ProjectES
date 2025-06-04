@@ -1,5 +1,7 @@
 package com.example.loginapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,8 +21,9 @@ public class Instrucao {
 	private String descricao;
 
 	@ManyToOne
-	@JoinColumn(name = "medicamento_id")
-	private Medicamento medicamento;
+    @JoinColumn(name = "medicamento_id")
+    @JsonBackReference // Lado "de volta" da referência - será ignorado na serialização
+    private Medicamento medicamento;
 
 	public Instrucao() {
 	}
