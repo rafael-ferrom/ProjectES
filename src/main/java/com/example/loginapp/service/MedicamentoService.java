@@ -7,8 +7,10 @@ import com.example.loginapp.dto.MedicamentoDTO;
 import com.example.loginapp.entity.Medicamento;
 
 public interface MedicamentoService {
-	
-	Medicamento adicionarMedicamento(MedicamentoDTO dto);
+    
+    Medicamento adicionarMedicamento(MedicamentoDTO dto);
     List<Medicamento> listarPorUsuario(Long userId);
     Optional<Medicamento> buscarPorId(Long id);
+    // NEW: Method to start a treatment
+    Medicamento iniciarTratamento(Long id); 
 }

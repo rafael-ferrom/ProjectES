@@ -15,6 +15,7 @@ import com.example.loginapp.repository.MedicamentoRepository;
 import com.example.loginapp.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 public class MedicamentoServiceImpl implements MedicamentoService {
@@ -67,5 +68,19 @@ public class MedicamentoServiceImpl implements MedicamentoService {
 	public Optional<Medicamento> buscarPorId(Long id) {
 		return medicamentoRepository.findById(id);
 	}
+
+	@Override
+  @Transactional
+  public Medicamento iniciarTratamento(Long id) {
+    Medicamento medicamento = medicamentoRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Medicamento não encontrado."));
+    
+    Frequencia frequencia = medicamento.getFrequencia();
+    if (frequencia.getPrimeiraDoseTimestamp() == null) {
+      frequencia.setPrimeiraDoseTimestamp(LocalDateTime.now());
+      medicamentoRepository.save(medicamento);
+    }
+    return medicamento;
+  }
 
 }

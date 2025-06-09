@@ -192,6 +192,15 @@ export const useMedicationStore = defineStore("medication", {
         this.userConfiguredMedicamentos = []; // Clear state on error
       }
     },
+
+    /**
+     * Calls the backend to register that a treatment has started.
+     * @param {number} medicationId - The ID of the configured medication.
+     */
+    startTreatment(medicationId) {
+      const url = `${API_URL}/api/medicamentos/${medicationId}/iniciar-tratamento`;
+      return axios.put(url);
+    }
   },
 });
 
