@@ -89,7 +89,7 @@ import { useMedicationStore } from "@/store/index.js";
 import { mapActions } from 'pinia';
 
 export default {
-  name: 'ConfigureMedicationView', // Renamed for clarity
+  name: 'ConfigureMedicationView',
   props: {
     id: { type: String, required: true },
   },
@@ -104,9 +104,10 @@ export default {
         nome: '',
         dosagem: '',
         dataInicio: new Date().toISOString().substr(0, 10),
-        duracaoDias: 7, // Default value
+        duracaoDias: 7,
         vezesPorDia: null,
-        instrucoes: '',
+        // The instructions field is now pre-populated
+        instrucoes: '', 
       },
       dateMenus: {
         start: false,
@@ -132,9 +133,15 @@ export default {
   async created() {
     this.medicationDetails = await this.fetchMedicationById(this.id);
     if (this.medicationDetails) {
-      // Pre-fill form with data from the medication details
       this.config.nome = this.medicationDetails.nomeComercial;
       this.config.dosagem = this.medicationDetails.concentracao;
+
+      // NEW: Pre-populate the instructions textarea
+      // We check if instructions exist and join the array into a single string with newlines
+      if (this.medicationDetails.instrucoes && this.medicationDetails.instrucoes.length > 0) {
+        this.config.instrucoes = this.medicationDetails.instrucoes.join('\n');
+      }
+
     } else {
       this.error = true;
     }
@@ -155,22 +162,19 @@ export default {
 
       // Construct the payload to match MedicamentoDTO
       const payload = {
-        // From user input
         nome: this.config.nome,
         dosagem: this.config.dosagem,
         dataInicio: this.config.dataInicio,
         dataTermino: endDate.toISOString().substr(0, 10),
         vezesPorDia: this.config.vezesPorDia,
-        // The DTO requires a list of strings for instructions
         instrucoes: this.config.instrucoes.split('\n').filter(line => line.trim() !== ''),
-        // From fetched medication details
         nomeComercial: this.medicationDetails.nomeComercial,
         principioAtivo: this.medicationDetails.principioAtivo,
         concentracao: this.medicationDetails.concentracao,
         formaFarmaceutica: this.medicationDetails.formaFarmaceutica,
         apresentacao: this.medicationDetails.apresentacao,
         fabricante: this.medicationDetails.fabricante,
-        tipo: this.medicationDetails.formaFarmaceutica.toLowerCase(), // Use formaFarmaceutica as 'tipo'
+        tipo: this.medicationDetails.formaFarmaceutica.toLowerCase(),
       };
 
       try {
@@ -178,7 +182,6 @@ export default {
         this.snackbar.text = 'Treatment saved successfully!';
         this.snackbar.color = 'success';
         this.snackbar.show = true;
-        // Redirect user after successful submission
         setTimeout(() => this.$router.push({ name: 'home' }), 1500);
 
       } catch (error) {

@@ -76,7 +76,7 @@
             
             <v-expansion-panels flat class="mt-3">
               <v-expansion-panel>
-                <v-expansion-panel-header>Medication Info & Instructions {{med.instrucoes}}</v-expansion-panel-header>
+                <v-expansion-panel-header>Medication Info & Instructions</v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <strong>{{ med.bula.nomeComercial }} ({{ med.bula.principioAtivo }})</strong>
                   <p class="text-caption grey--text">{{ med.bula.fabricante }} - {{ med.bula.apresentacao }}</p>
