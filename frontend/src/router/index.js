@@ -4,7 +4,6 @@ import AuthenticatedLayout from "./../layouts/AuthenticatedLayout.vue";
 import LandingView from './../views/LandingView.vue';
 import LoginView from "./../views/LoginView.vue";
 import HomeView from "./../views/HomeView.vue";
-import MedicationDetailView from "./../views/MedicationDetailView.vue";
 import DosageConfigurationView from "./../views/DosageConfigurationView.vue";
 import ActiveMedicationsView from "./../views/ActiveMedicationsView.vue";
 import RegisterView from "./../views/RegisterView.vue";
@@ -51,15 +50,10 @@ const routes = [
         name: "home",
         component: HomeView,
       },
+      // The old 'medication-detail' route is removed.
       {
-        path: "medication/:id",
-        name: "medication-detail",
-        component: MedicationDetailView,
-        props: true
-      },
-      {
-        path: "medication/:id/dosage",
-        name: "dosage-configuration",
+        path: "configure-medication/:id",
+        name: "configure-medication",
         component: DosageConfigurationView,
         props: true
       },

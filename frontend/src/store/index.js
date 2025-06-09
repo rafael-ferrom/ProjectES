@@ -9,7 +9,7 @@ const LOCAL_STORAGE_KEY = 'activeMedicationsV1';
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: undefined,
-    userId: undefined,
+    userId: 4,
     apiKey: undefined
   }),
   getters: {
@@ -99,6 +99,8 @@ export const useDisplayStore = defineStore("display", {
 export const useMedicationStore = defineStore("medication", {
   state: () => ({
     medicamentos: [],
+    // Add state to hold the details of a single selected medication
+    selectedMedicationDetails: null, 
   }),
   getters: {
     getAllMedicamentos: (state) => state.medicamentos,
@@ -129,6 +131,44 @@ export const useMedicationStore = defineStore("medication", {
         this.medicamentos = [];
       }
     },
+
+    /**
+     * Fetches details for a single medication ('bula') from the API.
+     * @param {string} id - The ID of the medication to fetch.
+     */
+    async fetchMedicationById(id) {
+      try {
+        const response = await axios.get(`${API_URL}/api/bulas/${id}`);
+        this.selectedMedicationDetails = response.data;
+        return response.data;
+      } catch (error) {
+        console.error(`Failed to fetch medication with id ${id}:`, error);
+        this.selectedMedicationDetails = null;
+      }
+    },
+
+    /**
+     * Posts a new medication configuration to the backend.
+     * @param {object} medicationPayload - The payload matching the MedicamentoDTO.
+     */
+    async addMedicationConfiguration(medicationPayload) {
+      // The "auth" store is needed to get the userId
+      const authStore = useAuthStore();
+      if (!authStore.userId) {
+        throw new Error("User is not authenticated.");
+      }
+
+      const payloadWithUser = {
+        ...medicationPayload,
+        userId: parseInt(authStore.userId, 10),
+      };
+
+      // The endpoint for adding a new medication configuration
+      const url = `${API_URL}/api/medicamentos`;
+      
+      // Axios will automatically handle JSON stringification
+      return axios.post(url, payloadWithUser);
+    }
   },
 });
 

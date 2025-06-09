@@ -98,7 +98,7 @@ export default {
     ]),
     viewMedicationDetails(medicamento) {
       this.$router.push({
-        name: 'medication-detail',
+        name: 'configure-medication',
         params: {
           id: medicamento.id.toString()
         }
