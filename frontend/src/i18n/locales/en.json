@@ -1,0 +1,116 @@
+{
+  "hello": "Hello",
+  "instructions": {
+    "logout": "Logout",
+    "ok": "Ok",
+    "close": "Close",
+    "login": "Login",
+    "next": "Next",
+    "back": "Back",
+    "sign-in": "Sign Up"
+  },
+  "extras": {
+    "at": "at",
+    "no": "No",
+    "yes": "Yes",
+    "footer": "© 2023-2024 Tech Pharmacy All rights reserved.",
+    "language": "Language"
+  },
+  "menus": {
+    "home": "Medications",
+    "activeMedications": "Active Medications"
+  },
+  "medication": {
+    "title": "Medication Catalog"
+  },
+  "toolbar": {
+    "empresaTrading": "João Silva (demo) | EMPRESA TRADING LTDA",
+    "timeZone": "Time Zone: BRT",
+    "title": "Hedge",
+    "errorMessage": "Unable to log out. Please try again later."
+  },
+  "requestHelp": {
+    "requestHelp": "Request Help",
+    "greeting": "Hello, how can we assist you?",
+    "instruction": "Select how you would like to receive help from our Customer Service Representatives",
+    "sendEmail": {
+      "title": "Send us an Email",
+      "btnText": "Send Email"
+    },
+    "helpTicket": {
+      "title": "Submit a Support Ticket",
+      "description": "We will respond as soon as possible",
+      "btnText": "Start Ticket (TBR)"
+    },
+    "liveChat": {
+      "title": "Live Chat",
+      "btnText": "Start Chat (TBR)"
+    }
+  },
+  "landing": {
+    "title": "Organize your medication routine",
+    "description": {
+      "descriptionOne": "Register your medications and set the schedule for each dose.",
+      "descriptionTwo": "Receive automatic alerts and track treatment progress.",
+      "descriptionThree": "See how much time is left for the next dose and how much has been completed.",
+      "descriptionFour": "All in one place, simple and easy to use."
+    },
+    "gridPro": {
+      "title": "Custom treatment records",
+      "descriptionOne": "Choose the medication you are using and set the interval between doses and the treatment duration.",
+      "descriptionTwo": "With just a few clicks, you create a personalized schedule for each medication.",
+      "descriptionThree": "Ideal for patients in continuous or temporary treatments.",
+      "descriptionFour": "Simple organization, intuitive visuals."
+    },
+    "fxMarket": {
+      "title": "Real-time tracking",
+      "descriptionOne": "After registering your medications, track the remaining time for the next dose.",
+      "descriptionTwo": "See how many % of the treatment has been completed.",
+      "descriptionThree": "Receive visual reminders and optimize your treatment adherence.",
+      "descriptionFour": "More autonomy for you or for those you care for.",
+      "descriptionFive": "Also ideal for caregivers and healthcare professionals."
+    },
+    "algorithmic": {
+      "title": "Modern and secure solution",
+      "descriptionOne": "No more loose notes or confusing alarms:",
+      "descriptionTwo": " our platform gathers all treatment data in one place.",
+      "descriptionThree": "With an intuitive and responsive design, it adapts to your daily life.",
+      "descriptionFour": "Lightweight, fast, reliable:",
+      "descriptionFive": " your health deserves the best technology.",
+      "descriptionSix": "Try it now."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "description": {
+      "descriptionOne": "This is a secure authentication service from Tech Pharmacy",
+      "descriptionTwo": "that allows access to Tech Pharmacy services",
+      "descriptionThree": "from wherever you are."
+    },
+    "corporateEmail": "Corporate Email",
+    "password": "Password",
+    "authenticationFail": "User authentication failed: invalid credentials"
+  },
+  "register": {
+    "title": "Register",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "register": "Register",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Login",
+    "authenticationFail": "User registration failed: invalid credentials"
+  },
+  "notFound": {
+    "title": "404 Page Not Found",
+    "descriptionOne": "It seems you found a page that doesn't exist on Tech Pharmacy.",
+    "descriptionTwo": "This can happen when you follow a link to something that has been deleted.",
+    "descriptionThree": "Or the link was incorrect from the start.",
+    "apologies": "Sorry about that."
+  }
+}

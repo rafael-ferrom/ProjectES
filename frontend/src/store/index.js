@@ -1,0 +1,180 @@
+import { defineStore } from "pinia"
+import axiosInstance from "@/http.js"
+const axios = axiosInstance
+
+export let API_URL = process.env.VUE_APP_API_URL
+export const API_USERS = `api/users`
+const LOCAL_STORAGE_KEY = 'activeMedicationsV1';
+
+export const useAuthStore = defineStore("auth", {
+  state: () => ({
+    authenticated: undefined,
+    userId: undefined,
+    apiKey: undefined
+  }),
+  getters: {
+    isAuthenticated: (state) => state.authenticated,
+    getUserId: (state) => state.userId,
+    getApiKey: (state) => state.apiKey,
+  },
+  actions: {
+    getAuthenticated () {
+      this.loadAuthenticatedAndUserIdStateFromLocalStorage()
+    },
+    loadAuthenticatedAndUserIdStateFromLocalStorage () {
+      let userId = localStorage.getItem("userId")
+      let authenticated = false
+      if (userId) {
+        authenticated = true
+      }
+      this.authenticated = authenticated
+      this.userId = userId
+    },
+    saveSessionLocalStorage (data) {
+      localStorage.setItem("userId", data.user_id)
+    },
+    removeSessionLocalStorage () {
+      localStorage.removeItem("userId")
+      localStorage.removeItem("apiKey")
+    },
+    getSessionFromLocalStorage () {
+      const data = localStorage.getItem("userId")
+      return data
+    },
+    registerUser (data) {
+      const url = `${API_URL}/${API_USERS}/register`
+      return axios.post(url, data)
+    },
+    login(data) {
+      const url = `${API_URL}/${API_USERS}/login`
+      return axios.post(url, data)
+    },
+  },
+});
+
+export const useDisplayStore = defineStore("display", {
+  state: () => ({
+    breakpoint: undefined,
+    windowHeight: window.innerHeight,
+    headerHeight: 153,
+    // footerHeight: 30,
+    marginLayout: 32,
+  }),
+  getters: {
+    isMobile() {
+      return this.mobile
+    },
+    currentBreakpoint () {
+      return this.breakpoint
+    },
+    isXLarge () {
+      return this.currentBreakpoint === "xl"
+    },
+    isLarge () {
+      return this.currentBreakpoint === "lg"
+    },
+    isMedium () {
+      return this.currentBreakpoint === "md"
+    },
+    isSmall () {
+      return this.currentBreakpoint === "sm"
+    },
+    isXSmall () {
+      return this.currentBreakpoint === "xs"
+    },
+    contentHeight () {
+      const contentHeight = 
+        this.windowHeight 
+        - this.headerHeight 
+        // - this.footerHeight 
+        // - this.marginLayout // x axis
+        // - this.marginLayout // y axis
+      return `${contentHeight}`
+    },
+  },
+  actions: {
+  }
+})
+
+export const useMedicationStore = defineStore("medication", {
+  state: () => ({
+    medicamentos: [],
+  }),
+  getters: {
+    getAllMedicamentos: (state) => state.medicamentos,
+    getMedicamentoById: (state) => {
+      return (id) => state.medicamentos.find((medicamento) => medicamento.id == id);
+    },
+  },
+  actions: {
+    transformBulaToMedicamento(bula) {
+      return {
+        id: bula.id,
+        fotoLink: null,
+        nome: `${bula.nomeComercial} ${bula.concentracao}`,
+        descricao: `A medication based on ${bula.principioAtivo}. Presented in a ${bula.apresentacao.toLowerCase()}.`,
+        informacoesDeUso: `Follow the medical instructions for ${bula.nomeComercial}.`
+      };
+    },
+    async fetchMedicamentos() {
+      if (this.medicamentos.length > 0) {
+        return;
+      }
+      try {
+        const response = await axios.get(`${API_URL}/api/bulas`);
+        const transformedData = response.data.map(bula => this.transformBulaToMedicamento(bula));
+        this.medicamentos = transformedData;
+      } catch (error) {
+        console.error("Failed to fetch medications:", error);
+        this.medicamentos = [];
+      }
+    },
+  },
+});
+
+export const useActiveMedicationsStore = defineStore("activeMedications", {
+  state: () => ({
+    activeMedicamentos: [],
+  }),
+  getters: {
+    getAllActiveMedicamentos: (state) => state.activeMedicamentos,
+    hasActiveMedicamentos: (state) => state.activeMedicamentos.length > 0,
+  },
+  actions: {
+    loadActiveMedicamentosFromLocalStorage() {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (data) {
+        try {
+          this.activeMedicamentos = JSON.parse(data);
+        } catch (e) {
+          console.error("Erro ao carregar medicamentos ativos do localStorage:", e);
+          this.activeMedicamentos = [];
+        }
+      } else {
+        this.activeMedicamentos = [];
+      }
+    },
+    saveActiveMedicamentosToLocalStorage() {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.activeMedicamentos));
+      } catch (e) {
+        console.error("Erro ao salvar medicamentos ativos no localStorage:", e);
+      }
+    },
+    addActiveMedication(medicationData) {
+      const newActiveMedication = {
+        ...medicationData,
+        configurationTimestamp: Date.now(),
+        activeId: `active-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      };
+      this.activeMedicamentos.push(newActiveMedication);
+      this.saveActiveMedicamentosToLocalStorage();
+    },
+    removeActiveMedication(activeIdToRemove) {
+      this.activeMedicamentos = this.activeMedicamentos.filter(
+        (med) => med.activeId !== activeIdToRemove
+      );
+      this.saveActiveMedicamentosToLocalStorage();
+    },
+  },
+});
