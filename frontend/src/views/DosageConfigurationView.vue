@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="12" sm="10" md="8" lg="7" xl="6">
+      <v-col cols="12" sm="10" md="8" lg="7" xl="6" class="pt-16">
         <div v-if="loading" class="text-center pa-12">
           <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
           <p class="mt-4">Loading Medication Details...</p>
@@ -156,37 +156,38 @@ export default {
 
       this.submitting = true;
 
-      // Calculate end date
+      // Calcula a data de término
       const startDate = new Date(this.config.dataInicio);
-      const endDate = new Date(startDate.setDate(startDate.getDate() + parseInt(this.config.duracaoDias, 10)));
+      // Clone startDate to avoid modifying it directly
+      const endDate = new Date(startDate.getTime());
+      endDate.setDate(endDate.getDate() + parseInt(this.config.duracaoDias, 10));
 
-      // Construct the payload to match MedicamentoDTO
+      // >>>>> PAYLOAD CORRIGIDO <<<<<
       const payload = {
+        // Campos do formulário
         nome: this.config.nome,
         dosagem: this.config.dosagem,
+        tipo: this.medicationDetails.formaFarmaceutica.toLowerCase(),
         dataInicio: this.config.dataInicio,
         dataTermino: endDate.toISOString().substr(0, 10),
         vezesPorDia: this.config.vezesPorDia,
         instrucoes: this.config.instrucoes.split('\n').filter(line => line.trim() !== ''),
-        nomeComercial: this.medicationDetails.nomeComercial,
-        principioAtivo: this.medicationDetails.principioAtivo,
-        concentracao: this.medicationDetails.concentracao,
-        formaFarmaceutica: this.medicationDetails.formaFarmaceutica,
-        apresentacao: this.medicationDetails.apresentacao,
-        fabricante: this.medicationDetails.fabricante,
-        tipo: this.medicationDetails.formaFarmaceutica.toLowerCase(),
+        
+        // ID da bula que está sendo configurada (da prop `id` do componente)
+        bulaId: parseInt(this.id, 10)
       };
 
       try {
+        // A action addMedicationConfiguration já inclui o userId, então não precisamos passá-lo aqui.
         await this.addMedicationConfiguration(payload);
-        this.snackbar.text = 'Treatment saved successfully!';
+        this.snackbar.text = 'Tratamento salvo com sucesso!';
         this.snackbar.color = 'success';
         this.snackbar.show = true;
         setTimeout(() => this.$router.push({ name: 'home' }), 1500);
 
       } catch (error) {
-        console.error("Error saving treatment:", error);
-        this.snackbar.text = 'Error saving treatment. Please try again.';
+        console.error("Erro ao salvar tratamento:", error);
+        this.snackbar.text = 'Erro ao salvar tratamento. Tente novamente.';
         this.snackbar.color = 'error';
         this.snackbar.show = true;
       } finally {

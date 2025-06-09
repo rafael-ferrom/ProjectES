@@ -112,7 +112,7 @@ export const useMedicationStore = defineStore("medication", {
     transformBulaToMedicamento(bula) {
       return {
         id: bula.id,
-        fotoLink: null,
+        fotoLink: bula.fotoUrl,
         nome: `${bula.nomeComercial} ${bula.concentracao}`,
         descricao: `A medication based on ${bula.principioAtivo}. Presented in a ${bula.apresentacao.toLowerCase()}.`,
         informacoesDeUso: `Follow the medical instructions for ${bula.nomeComercial}.`

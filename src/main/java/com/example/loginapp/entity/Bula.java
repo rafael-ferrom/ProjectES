@@ -17,104 +17,115 @@ import jakarta.persistence.Table;
 @Table(name = "bulas")
 public class Bula {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	private String nomeComercial;
-	private String principioAtivo;
-	private String concentracao;
-	private String formaFarmaceutica;
-	private String apresentacao;
-	private String fabricante;
+  private String nomeComercial;
+  private String principioAtivo;
+  private String concentracao;
+  private String formaFarmaceutica;
+  private String apresentacao;
+  private String fabricante;
 
-	// NEW: Added a list for default instructions
-	@ElementCollection
-	@CollectionTable(name = "bula_instrucoes", joinColumns = @JoinColumn(name = "bula_id"))
-	@Column(name = "instrucao")
-	private List<String> instrucoes = new ArrayList<>();
+  // NEW: Field for the medicine photo URL
+  private String fotoUrl;
 
-	public Bula() {
-	}
+  @ElementCollection
+  @CollectionTable(name = "bula_instrucoes", joinColumns = @JoinColumn(name = "bula_id"))
+  @Column(name = "instrucao")
+  private List<String> instrucoes = new ArrayList<>();
 
-	public Bula(String nomeComercial, String principioAtivo, String concentracao, String formaFarmaceutica,
-			String apresentacao, String fabricante) {
-		this.nomeComercial = nomeComercial;
-		this.principioAtivo = principioAtivo;
-		this.concentracao = concentracao;
-		this.formaFarmaceutica = formaFarmaceutica;
-		this.apresentacao = apresentacao;
-		this.fabricante = fabricante;
-	}
+  public Bula() {
+  }
 
-	// NEW: Method to add instructions easily
-	public void adicionarInstrucao(String instrucao) {
-		this.instrucoes.add(instrucao);
-	}
+  public Bula(String nomeComercial, String principioAtivo, String concentracao, String formaFarmaceutica,
+      String apresentacao, String fabricante, String fotoUrl) {
+    this.nomeComercial = nomeComercial;
+    this.principioAtivo = principioAtivo;
+    this.concentracao = concentracao;
+    this.formaFarmaceutica = formaFarmaceutica;
+    this.apresentacao = apresentacao;
+    this.fabricante = fabricante;
+    this.fotoUrl = fotoUrl;
+  }
 
-	// Getters and Setters for all fields, including the new 'instrucoes' list
+  public void adicionarInstrucao(String instrucao) {
+    this.instrucoes.add(instrucao);
+  }
 
-	public Long getId() {
-		return id;
-	}
+  // Getters and Setters for all fields
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getNomeComercial() {
-		return nomeComercial;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setNomeComercial(String nomeComercial) {
-		this.nomeComercial = nomeComercial;
-	}
+  public String getNomeComercial() {
+    return nomeComercial;
+  }
 
-	public String getPrincipioAtivo() {
-		return principioAtivo;
-	}
+  public void setNomeComercial(String nomeComercial) {
+    this.nomeComercial = nomeComercial;
+  }
 
-	public void setPrincipioAtivo(String principioAtivo) {
-		this.principioAtivo = principioAtivo;
-	}
+  public String getPrincipioAtivo() {
+    return principioAtivo;
+  }
 
-	public String getConcentracao() {
-		return concentracao;
-	}
+  public void setPrincipioAtivo(String principioAtivo) {
+    this.principioAtivo = principioAtivo;
+  }
 
-	public void setConcentracao(String concentracao) {
-		this.concentracao = concentracao;
-	}
+  public String getConcentracao() {
+    return concentracao;
+  }
 
-	public String getFormaFarmaceutica() {
-		return formaFarmaceutica;
-	}
+  public void setConcentracao(String concentracao) {
+    this.concentracao = concentracao;
+  }
 
-	public void setFormaFarmaceutica(String formaFarmaceutica) {
-		this.formaFarmaceutica = formaFarmaceutica;
-	}
+  public String getFormaFarmaceutica() {
+    return formaFarmaceutica;
+  }
 
-	public String getApresentacao() {
-		return apresentacao;
-	}
+  public void setFormaFarmaceutica(String formaFarmaceutica) {
+    this.formaFarmaceutica = formaFarmaceutica;
+  }
 
-	public void setApresentacao(String apresentacao) {
-		this.apresentacao = apresentacao;
-	}
+  public String getApresentacao() {
+    return apresentacao;
+  }
 
-	public String getFabricante() {
-		return fabricante;
-	}
+  public void setApresentacao(String apresentacao) {
+    this.apresentacao = apresentacao;
+  }
 
-	public void setFabricante(String fabricante) {
-		this.fabricante = fabricante;
-	}
+  public String getFabricante() {
+    return fabricante;
+  }
 
-	public List<String> getInstrucoes() {
-		return instrucoes;
-	}
+  public void setFabricante(String fabricante) {
+    this.fabricante = fabricante;
+  }
 
-	public void setInstrucoes(List<String> instrucoes) {
-		this.instrucoes = instrucoes;
-	}
+  public List<String> getInstrucoes() {
+    return instrucoes;
+  }
+
+  public void setInstrucoes(List<String> instrucoes) {
+    this.instrucoes = instrucoes;
+  }
+
+  // NEW: Getter and Setter for fotoUrl
+  public String getFotoUrl() {
+    return fotoUrl;
+  }
+
+  public void setFotoUrl(String fotoUrl) {
+    this.fotoUrl = fotoUrl;
+  }
 }

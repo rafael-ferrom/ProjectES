@@ -22,6 +22,7 @@
     <v-row v-else>
       <v-col v-for="med in processedMedications" :key="med.id" cols="12" md="6" lg="4">
         <v-card class="mx-auto d-flex flex-column" outlined elevation="2">
+          <v-img :src="med.bula.fotoUrl" height="100px" contain class="ma-2"></v-img>
           <v-card-title class="text-h6 font-weight-medium primary--text pb-1">
             {{ med.nome }}
           </v-card-title>

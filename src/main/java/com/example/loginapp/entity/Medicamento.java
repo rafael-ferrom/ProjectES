@@ -32,30 +32,32 @@ public class Medicamento {
     @JoinColumn(name = "frequencia_id")
     private Frequencia frequencia;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    // >>>>> ALTERAÇÃO PRINCIPAL AQUI <<<<<
+    // Mudado de @OneToOne para @ManyToOne e removido o cascade.
+    @ManyToOne 
     @JoinColumn(name = "bula_id")
     private Bula bula;
 
     @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference // Lado "gerenciado" da referência
+    @JsonManagedReference 
     private List<Instrucao> instrucoes = new ArrayList<>();
 
-    private String tipo; // Ex: "comprimido", "líquido", "injeção"
+    // A relação com Dose foi movida para o final para manter a consistência
+    @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Dose> doses = new ArrayList<>();
+
+    private String tipo;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // NEW: One-to-Many relationship with Dose
-    @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private List<Dose> doses = new ArrayList<>();
-
-    // Construtores
     public Medicamento() {
     }
 
-    public Medicamento(String nome, String dosagem, Frequencia frequencia, Bula bula, String tipo, User user) {
+    public Medicamento(String nome, String dosagem, Frequencia frequencia, 
+                       Bula bula, String tipo, User user) {
         this.nome = nome;
         this.dosagem = dosagem;
         this.frequencia = frequencia;
@@ -64,15 +66,12 @@ public class Medicamento {
         this.user = user;
     }
 
-    // Método para adicionar instruções
     public void adicionarInstrucao(String descricao) {
-        Instrucao instrucao = new Instrucao();
-        instrucao.setDescricao(descricao);
-        instrucao.setMedicamento(this);
+        Instrucao instrucao = new Instrucao(descricao, this);
         this.instrucoes.add(instrucao);
     }
 
-    // Getters e Setters existentes
+    // Getters e Setters (sem alterações)
     public Long getId() {
         return id;
     }
@@ -137,8 +136,7 @@ public class Medicamento {
         this.user = user;
     }
 
-    // NEW: Getter and Setter for doses
-    public List<Dose> getDoses() {
+     public List<Dose> getDoses() {
         return doses;
     }
 

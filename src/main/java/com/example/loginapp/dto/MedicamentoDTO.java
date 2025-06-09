@@ -7,26 +7,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class MedicamentoDTO {
 
-	private String nome;
+    private String nome;
     private String dosagem;
-    
+    private String tipo;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataInicio;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataTermino;
     private int vezesPorDia;
     
-    private String nomeComercial;
-    private String principioAtivo;
-    private String concentracao;
-    private String formaFarmaceutica;
-    private String apresentacao;
-    private String fabricante;
-    
     private List<String> instrucoes;
     
-    private String tipo;
     private Long userId;
+    private Long bulaId;
 
     public MedicamentoDTO() {
     }
@@ -71,54 +65,6 @@ public class MedicamentoDTO {
         this.vezesPorDia = vezesPorDia;
     }
 
-    public String getNomeComercial() {
-        return nomeComercial;
-    }
-
-    public void setNomeComercial(String nomeComercial) {
-        this.nomeComercial = nomeComercial;
-    }
-
-    public String getPrincipioAtivo() {
-        return principioAtivo;
-    }
-
-    public void setPrincipioAtivo(String principioAtivo) {
-        this.principioAtivo = principioAtivo;
-    }
-
-    public String getConcentracao() {
-        return concentracao;
-    }
-
-    public void setConcentracao(String concentracao) {
-        this.concentracao = concentracao;
-    }
-
-    public String getFormaFarmaceutica() {
-        return formaFarmaceutica;
-    }
-
-    public void setFormaFarmaceutica(String formaFarmaceutica) {
-        this.formaFarmaceutica = formaFarmaceutica;
-    }
-
-    public String getApresentacao() {
-        return apresentacao;
-    }
-
-    public void setApresentacao(String apresentacao) {
-        this.apresentacao = apresentacao;
-    }
-
-    public String getFabricante() {
-        return fabricante;
-    }
-
-    public void setFabricante(String fabricante) {
-        this.fabricante = fabricante;
-    }
-
     public List<String> getInstrucoes() {
         return instrucoes;
     }
@@ -142,6 +88,12 @@ public class MedicamentoDTO {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+
+    public Long getBulaId() {
+        return bulaId;
+    }
+
+    public void setBulaId(Long bulaId) {
+        this.bulaId = bulaId;
+    }
 }
-
-

@@ -11,9 +11,10 @@ import com.example.loginapp.entity.Bula;
 import com.example.loginapp.entity.Frequencia;
 import com.example.loginapp.entity.Medicamento;
 import com.example.loginapp.entity.User;
+import com.example.loginapp.entity.Dose;
+import com.example.loginapp.repository.BulaRepository;
 import com.example.loginapp.repository.MedicamentoRepository;
 import com.example.loginapp.repository.UserRepository;
-import com.example.loginapp.entity.Dose;
 import com.example.loginapp.repository.DoseRepository;
 
 import jakarta.transaction.Transactional;
@@ -21,43 +22,41 @@ import jakarta.transaction.Transactional;
 @Service
 public class MedicamentoServiceImpl implements MedicamentoService {
 
-	private final MedicamentoRepository medicamentoRepository;
-	private final UserRepository userRepository;
+  private final MedicamentoRepository medicamentoRepository;
+  private final UserRepository userRepository;
+  private final BulaRepository bulaRepository;
+  private final DoseRepository doseRepository;
 
-	@Autowired
-	public MedicamentoServiceImpl(MedicamentoRepository medicamentoRepository, UserRepository userRepository) {
-		this.medicamentoRepository = medicamentoRepository;
-		this.userRepository = userRepository;
-	}
+  @Autowired
+  public MedicamentoServiceImpl(MedicamentoRepository medicamentoRepository, UserRepository userRepository, BulaRepository bulaRepository, DoseRepository doseRepository) {
+    this.medicamentoRepository = medicamentoRepository;
+    this.userRepository = userRepository;
+    this.bulaRepository = bulaRepository;
+    this.doseRepository = doseRepository;
+  }
 
-	@Autowired
-  private DoseRepository doseRepository;
+  @Override
+  @Transactional
+  public Medicamento adicionarMedicamento(MedicamentoDTO dto) {
+    User user = userRepository.findById(dto.getUserId())
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-	@Override
-	@Transactional
-	public Medicamento adicionarMedicamento(MedicamentoDTO dto) {
-		Optional<User> userOpt = userRepository.findById(dto.getUserId());
-		if (userOpt.isEmpty())
-			throw new RuntimeException("Usuário não encontrado.");
+    Bula bula = bulaRepository.findById(dto.getBulaId())
+        .orElseThrow(() -> new RuntimeException("Bula não encontrada."));
 
-		User user = userOpt.get();
+    Frequencia frequencia = new Frequencia(dto.getDataInicio(), dto.getDataTermino(), dto.getVezesPorDia());
 
-		Frequencia frequencia = new Frequencia(dto.getDataInicio(), dto.getDataTermino(), dto.getVezesPorDia());
+    Medicamento medicamento = new Medicamento(dto.getNome(), dto.getDosagem(), frequencia, bula, dto.getTipo(),
+        user);
 
-		Bula bula = new Bula(dto.getNomeComercial(), dto.getPrincipioAtivo(), dto.getConcentracao(),
-				dto.getFormaFarmaceutica(), dto.getApresentacao(), dto.getFabricante());
+    if (dto.getInstrucoes() != null && !dto.getInstrucoes().isEmpty()) {
+      for (String instrucaoTexto : dto.getInstrucoes()) {
+        medicamento.adicionarInstrucao(instrucaoTexto);
+      }
+    }
 
-		Medicamento medicamento = new Medicamento(dto.getNome(), dto.getDosagem(), frequencia, bula, dto.getTipo(),
-				user);
-
-		if (dto.getInstrucoes() != null && !dto.getInstrucoes().isEmpty()) {
-			for (String instrucaoTexto : dto.getInstrucoes()) {
-				medicamento.adicionarInstrucao(instrucaoTexto);
-			}
-		}
-
-		return medicamentoRepository.save(medicamento);
-	}
+    return medicamentoRepository.save(medicamento);
+  }
 
 	@Override
 	public List<Medicamento> listarPorUsuario(Long userId) {
@@ -79,7 +78,6 @@ public class MedicamentoServiceImpl implements MedicamentoService {
     Medicamento medicamento = medicamentoRepository.findById(medicamentoId)
         .orElseThrow(() -> new RuntimeException("Medicamento não encontrado."));
     
-    // Cria e salva a nova dose
     Dose novaDose = new Dose(medicamento);
     doseRepository.save(novaDose);
   }
