@@ -98,9 +98,9 @@ export const useDisplayStore = defineStore("display", {
 
 export const useMedicationStore = defineStore("medication", {
   state: () => ({
-    medicamentos: [],
-    // Add state to hold the details of a single selected medication
-    selectedMedicationDetails: null, 
+    medicamentos: [], // Master list of all available medications
+    selectedMedicationDetails: null,
+    userConfiguredMedicamentos: [], // New state to hold the user's configured medications
   }),
   getters: {
     getAllMedicamentos: (state) => state.medicamentos,
@@ -168,7 +168,30 @@ export const useMedicationStore = defineStore("medication", {
       
       // Axios will automatically handle JSON stringification
       return axios.post(url, payloadWithUser);
-    }
+    },
+
+    /**
+     * Fetches all configured medications for the currently authenticated user.
+     */
+    async fetchUserConfiguredMedicamentos() {
+      const authStore = useAuthStore();
+      const userId = authStore.userId;
+
+      if (!userId) {
+        console.error("Cannot fetch user medications without a userId.");
+        this.userConfiguredMedicamentos = [];
+        return;
+      }
+
+      try {
+        const url = `${API_URL}/api/medicamentos/usuario/${userId}`;
+        const response = await axios.get(url);
+        this.userConfiguredMedicamentos = response.data;
+      } catch (error) {
+        console.error("Failed to fetch user configured medications:", error);
+        this.userConfiguredMedicamentos = []; // Clear state on error
+      }
+    },
   },
 });
 
