@@ -12,5 +12,5 @@ public interface MedicamentoService {
     List<Medicamento> listarPorUsuario(Long userId);
     Optional<Medicamento> buscarPorId(Long id);
     // NEW: Method to start a treatment
-    Medicamento iniciarTratamento(Long id); 
+    void registrarDose(Long medicamentoId); 
 }

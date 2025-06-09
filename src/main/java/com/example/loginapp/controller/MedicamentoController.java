@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.loginapp.dto.MedicamentoDTO;
 import com.example.loginapp.entity.Bula;
@@ -76,11 +76,11 @@ public class MedicamentoController {
 		}).orElseGet(() -> ResponseEntity.notFound().build());
 	}
 
-	@PutMapping("/{id}/iniciar-tratamento")
-  public ResponseEntity<Medicamento> iniciarTratamento(@PathVariable Long id) {
+	@PostMapping("/{id}/doses")
+  public ResponseEntity<Void> registrarDose(@PathVariable Long id) {
     try {
-      Medicamento medicamentoAtualizado = medicamentoService.iniciarTratamento(id);
-      return ResponseEntity.ok(medicamentoAtualizado);
+      medicamentoService.registrarDose(id);
+      return ResponseEntity.ok().build();
     } catch (RuntimeException e) {
       return ResponseEntity.notFound().build();
     }

@@ -13,9 +13,10 @@ import com.example.loginapp.entity.Medicamento;
 import com.example.loginapp.entity.User;
 import com.example.loginapp.repository.MedicamentoRepository;
 import com.example.loginapp.repository.UserRepository;
+import com.example.loginapp.entity.Dose;
+import com.example.loginapp.repository.DoseRepository;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 
 @Service
 public class MedicamentoServiceImpl implements MedicamentoService {
@@ -28,6 +29,9 @@ public class MedicamentoServiceImpl implements MedicamentoService {
 		this.medicamentoRepository = medicamentoRepository;
 		this.userRepository = userRepository;
 	}
+
+	@Autowired
+  private DoseRepository doseRepository;
 
 	@Override
 	@Transactional
@@ -71,16 +75,12 @@ public class MedicamentoServiceImpl implements MedicamentoService {
 
 	@Override
   @Transactional
-  public Medicamento iniciarTratamento(Long id) {
-    Medicamento medicamento = medicamentoRepository.findById(id)
+  public void registrarDose(Long medicamentoId) {
+    Medicamento medicamento = medicamentoRepository.findById(medicamentoId)
         .orElseThrow(() -> new RuntimeException("Medicamento não encontrado."));
     
-    Frequencia frequencia = medicamento.getFrequencia();
-    if (frequencia.getPrimeiraDoseTimestamp() == null) {
-      frequencia.setPrimeiraDoseTimestamp(LocalDateTime.now());
-      medicamentoRepository.save(medicamento);
-    }
-    return medicamento;
+    // Cria e salva a nova dose
+    Dose novaDose = new Dose(medicamento);
+    doseRepository.save(novaDose);
   }
-
 }

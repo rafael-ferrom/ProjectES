@@ -21,9 +21,6 @@ public class Frequencia {
   private LocalDate dataTermino;
   private int vezesPorDia;
 
-  // NEW: Field to store the exact timestamp of the first dose taken
-  private LocalDateTime primeiraDoseTimestamp;
-
   public Frequencia() {
   }
 
@@ -31,7 +28,6 @@ public class Frequencia {
     this.dataInicio = dataInicio;
     this.dataTermino = dataTermino;
     this.vezesPorDia = vezesPorDia;
-    this.primeiraDoseTimestamp = null; // Starts as null
   }
 
   // Getters and Setters for all fields...
@@ -66,14 +62,5 @@ public class Frequencia {
 
   public void setVezesPorDia(int vezesPorDia) {
     this.vezesPorDia = vezesPorDia;
-  }
-
-  // NEW: Getter and Setter for the new field
-  public LocalDateTime getPrimeiraDoseTimestamp() {
-    return primeiraDoseTimestamp;
-  }
-
-  public void setPrimeiraDoseTimestamp(LocalDateTime primeiraDoseTimestamp) {
-    this.primeiraDoseTimestamp = primeiraDoseTimestamp;
   }
 }

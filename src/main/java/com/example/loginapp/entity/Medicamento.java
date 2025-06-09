@@ -21,7 +21,7 @@ import jakarta.persistence.Table;
 @Table(name = "medicamentos")
 public class Medicamento {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -46,11 +46,16 @@ public class Medicamento {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // NEW: One-to-Many relationship with Dose
+    @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Dose> doses = new ArrayList<>();
+
+    // Construtores
     public Medicamento() {
     }
 
-    public Medicamento(String nome, String dosagem, Frequencia frequencia, 
-                       Bula bula, String tipo, User user) {
+    public Medicamento(String nome, String dosagem, Frequencia frequencia, Bula bula, String tipo, User user) {
         this.nome = nome;
         this.dosagem = dosagem;
         this.frequencia = frequencia;
@@ -59,12 +64,15 @@ public class Medicamento {
         this.user = user;
     }
 
+    // Método para adicionar instruções
     public void adicionarInstrucao(String descricao) {
-        Instrucao instrucao = new Instrucao(descricao, this);
+        Instrucao instrucao = new Instrucao();
+        instrucao.setDescricao(descricao);
+        instrucao.setMedicamento(this);
         this.instrucoes.add(instrucao);
     }
 
-    // Getters e Setters
+    // Getters e Setters existentes
     public Long getId() {
         return id;
     }
@@ -129,4 +137,12 @@ public class Medicamento {
         this.user = user;
     }
 
+    // NEW: Getter and Setter for doses
+    public List<Dose> getDoses() {
+        return doses;
+    }
+
+    public void setDoses(List<Dose> doses) {
+        this.doses = doses;
+    }
 }
