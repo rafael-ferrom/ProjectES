@@ -1,9 +1,16 @@
 package com.example.loginapp.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +28,12 @@ public class Bula {
 	private String apresentacao;
 	private String fabricante;
 
+	// NEW: Added a list for default instructions
+	@ElementCollection
+	@CollectionTable(name = "bula_instrucoes", joinColumns = @JoinColumn(name = "bula_id"))
+	@Column(name = "instrucao")
+	private List<String> instrucoes = new ArrayList<>();
+
 	public Bula() {
 	}
 
@@ -33,6 +46,13 @@ public class Bula {
 		this.apresentacao = apresentacao;
 		this.fabricante = fabricante;
 	}
+
+	// NEW: Method to add instructions easily
+	public void adicionarInstrucao(String instrucao) {
+		this.instrucoes.add(instrucao);
+	}
+
+	// Getters and Setters for all fields, including the new 'instrucoes' list
 
 	public Long getId() {
 		return id;
@@ -88,5 +108,13 @@ public class Bula {
 
 	public void setFabricante(String fabricante) {
 		this.fabricante = fabricante;
+	}
+
+	public List<String> getInstrucoes() {
+		return instrucoes;
+	}
+
+	public void setInstrucoes(List<String> instrucoes) {
+		this.instrucoes = instrucoes;
 	}
 }
