@@ -50,16 +50,14 @@ export const useAuthStore = defineStore("auth", {
       const url = `${API_URL}/${API_USERS}/login`;
       try {
         const response = await axios.post(url, data);
-        // Se a requisição for bem-sucedida, atualize o estado AQUI
         this.saveSessionLocalStorage(response.data);
         this.authenticated = true;
         this.userId = response.data.user_id;
-        return response; // Retorna a resposta para o componente
+        return response;
       } catch (error) {
-        // Em caso de erro, garanta que o estado está como "não autenticado"
         this.authenticated = false;
         this.userId = null;
-        throw error; // Lança o erro para o componente poder tratá-lo (ex: mostrar snackbar)
+        throw error;
       }
     },
     logout() {
@@ -116,9 +114,9 @@ export const useDisplayStore = defineStore("display", {
 
 export const useMedicationStore = defineStore("medication", {
   state: () => ({
-    medicamentos: [], // Master list of all available medications
+    medicamentos: [], // Lista mestre de todos os medicamentos disponíveis
     selectedMedicationDetails: null,
-    userConfiguredMedicamentos: [], // New state to hold the user's configured medications
+    userConfiguredMedicamentos: [], // Novo estado para armazenar os medicamentos configurados pelo usuário
   }),
   getters: {
     getAllMedicamentos: (state) => state.medicamentos,
@@ -132,8 +130,8 @@ export const useMedicationStore = defineStore("medication", {
         id: bula.id,
         fotoLink: bula.fotoUrl,
         nome: `${bula.nomeComercial} ${bula.concentracao}`,
-        descricao: `A medication based on ${bula.principioAtivo}. Presented in a ${bula.apresentacao.toLowerCase()}.`,
-        informacoesDeUso: `Follow the medical instructions for ${bula.nomeComercial}.`
+        descricao: `Um medicamento baseado em ${bula.principioAtivo}. Apresentado em uma ${bula.apresentacao.toLowerCase()}.`,
+        informacoesDeUso: `Siga as instruções médicas para ${bula.nomeComercial}.`
       };
     },
     async fetchMedicamentos() {
@@ -145,35 +143,24 @@ export const useMedicationStore = defineStore("medication", {
         const transformedData = response.data.map(bula => this.transformBulaToMedicamento(bula));
         this.medicamentos = transformedData;
       } catch (error) {
-        console.error("Failed to fetch medications:", error);
+        console.error("Falha ao buscar medicamentos:", error);
         this.medicamentos = [];
       }
     },
-
-    /**
-     * Fetches details for a single medication ('bula') from the API.
-     * @param {string} id - The ID of the medication to fetch.
-     */
     async fetchMedicationById(id) {
       try {
         const response = await axios.get(`${API_URL}/api/bulas/${id}`);
         this.selectedMedicationDetails = response.data;
         return response.data;
       } catch (error) {
-        console.error(`Failed to fetch medication with id ${id}:`, error);
+        console.error(`Falha ao buscar medicamento com id ${id}:`, error);
         this.selectedMedicationDetails = null;
       }
     },
-
-    /**
-     * Posts a new medication configuration to the backend.
-     * @param {object} medicationPayload - The payload matching the MedicamentoDTO.
-     */
     async addMedicationConfiguration(medicationPayload) {
-      // The "auth" store is needed to get the userId
       const authStore = useAuthStore();
       if (!authStore.userId) {
-        throw new Error("User is not authenticated.");
+        throw new Error("Usuário não está autenticado.");
       }
 
       const payloadWithUser = {
@@ -181,22 +168,16 @@ export const useMedicationStore = defineStore("medication", {
         userId: parseInt(authStore.userId, 10),
       };
 
-      // The endpoint for adding a new medication configuration
       const url = `${API_URL}/api/medicamentos`;
       
-      // Axios will automatically handle JSON stringification
       return axios.post(url, payloadWithUser);
     },
-
-    /**
-     * Fetches all configured medications for the currently authenticated user.
-     */
     async fetchUserConfiguredMedicamentos() {
       const authStore = useAuthStore();
       const userId = authStore.userId;
 
       if (!userId) {
-        console.error("Cannot fetch user medications without a userId.");
+        console.error("Não é possível buscar medicamentos do usuário sem um userId.");
         this.userConfiguredMedicamentos = [];
         return;
       }
@@ -206,15 +187,10 @@ export const useMedicationStore = defineStore("medication", {
         const response = await axios.get(url);
         this.userConfiguredMedicamentos = response.data;
       } catch (error) {
-        console.error("Failed to fetch user configured medications:", error);
-        this.userConfiguredMedicamentos = []; // Clear state on error
+        console.error("Falha ao buscar medicamentos configurados pelo usuário:", error);
+        this.userConfiguredMedicamentos = [];
       }
     },
-
-    /**
-     * Calls the backend to record that a dose has been taken.
-     * @param {number} medicationId - The ID of the configured medication.
-     */
     async recordDose(medicationId) {
       const url = `${API_URL}/api/medicamentos/${medicationId}/doses`;
       return axios.post(url);

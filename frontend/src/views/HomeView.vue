@@ -17,7 +17,7 @@
               </v-row>
               <v-row v-else-if="!medicamentos.length" class="justify-center">
                 <v-alert type="info" border="left" colored-border color="primary">
-                  No medications found. Please try again later.
+                  Nenhum medicamento encontrado. Por favor, tente novamente mais tarde.
                 </v-alert>
               </v-row>
               <v-row v-else no-gutters class="justify-center">

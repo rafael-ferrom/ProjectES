@@ -53,17 +53,10 @@ export default {
     }),
   },
   mounted () {
-    const auth = Number(process.env.VUE_APP_AUTH)
-    if (auth) {
-      this.getAuthenticated()
-        .then(() => {})
-        .catch(() => {
-          this.authenticated = false
-          this.userId = undefined
-          this.removeSessionLocalStorage()
-          this.$router.push("/")
-        })
-    }
+    // const auth = Number(process.env.VUE_APP_AUTH)
+    // if (auth) {  
+    this.getAuthenticated()
+    // }
   }
 }
 </script>

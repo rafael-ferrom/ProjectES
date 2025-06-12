@@ -10,7 +10,7 @@ import RegisterView from "./../views/RegisterView.vue";
 import NotFoundView from './../views/NotFoundView.vue';
 import { useAuthStore } from "./../store/index";
 
-const auth = Number(process.env.VUE_APP_AUTH);
+// const auth = Number(process.env.VUE_APP_AUTH);
 
 const routes = [
   {
@@ -77,11 +77,11 @@ const router = new VueRouter({
   routes
 })
 
-function handleRedirect (to, next, isPublicRoute, authenticated) {
-  if (!isPublicRoute && !authenticated) {
+function handleRedirect (to, next, isPublicRoute, userId) {
+  if (!isPublicRoute && !userId) {
     return next("/login")
   }
-  if (authenticated && isPublicRoute) {
+  if (userId && isPublicRoute) {
     return next("/tech-pharmacy/home")
   }
   return next()
@@ -89,13 +89,11 @@ function handleRedirect (to, next, isPublicRoute, authenticated) {
 
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-
-  const authenticated = authStore.isAuthenticated 
+  useAuthStore().getAuthenticated()
+  const userId = authStore.userId
   const isPublicRoute = to.matched.some(record => record.meta.public)
 
-  console.log(`Valores da guarda -> isPublicRoute: ${isPublicRoute}, authenticated: ${authenticated}`);
-
-  return handleRedirect(to, next, isPublicRoute, authenticated)
+  return handleRedirect(to, next, isPublicRoute, userId)
 })
 
 export default router;
