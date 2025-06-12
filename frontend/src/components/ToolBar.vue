@@ -9,7 +9,7 @@
       class="d-flex flex-column fill-height"
     >
       <div class="d-flex text-caption text--disabled font-weight-regular">
-        Joao Brasileiro | ACME LTDA
+        Joao Brasileiro | ACME LTDA {{ authenticated }}
         <v-spacer></v-spacer>
         {{ $t('toolbar.timeZone') }}: BRT
       </div>
@@ -238,8 +238,8 @@
 </template>
 
 <script>
-import { mapActions, mapWritableState } from "pinia"
-// import { mapActions, mapState, mapWritableState } from "pinia"
+// import { mapActions, mapWritableState } from "pinia"
+import { mapActions, mapState, mapWritableState } from "pinia"
 import { useAuthStore } from "./../store/index"
 
 export default {
@@ -281,21 +281,10 @@ export default {
       "removeSessionLocalStorage",
       "getUserRoleFromLocalStorage"
     ]),
-    logoutClicked () {
+    logoutClicked() {
       this.logout()
-        .then(() => {
-          this.authenticated = false
-          this.userId = undefined
-          this.removeSessionLocalStorage()
-          this.$router.push("/")
-        })
-        .catch((error) => {
-          this.logoutError = true
-          this.errorMessage = "Unable to log out. Try again later."
-          console.log(error)
-        })
+      this.$router.push("/")
     },
-
     isActiveMenu(menuList) {
       const isCurrentRoute = menuList.some(menu => menu.to === this.$route.path)
 
@@ -310,8 +299,11 @@ export default {
   },
   computed: {
     ...mapWritableState(useAuthStore, [
-      "authenticated",
+      // "authenticated",
       "userId"
+    ]),
+    ...mapState(useAuthStore, [
+      "authenticated"
     ]),
     isPtBRLocale() {
       return this.$i18n.locale === "pt"

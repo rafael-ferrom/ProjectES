@@ -88,7 +88,7 @@
               :type="showPassword ? 'text' : 'password'"
               hint=""
               :persistent-hint="true"
-              @keyup.enter="validate"
+              @keyup.enter="loginUser()"
             >
               <!-- prepend-inner-icon="mdi-key" -->
               <template v-slot:prepend-inner>
@@ -273,8 +273,7 @@ export default {
   },
   methods: {
     ...mapActions(useAuthStore, [
-      "login",
-      "saveSessionLocalStorage"
+      "login"
     ]),
     validate () {
       this.$refs.form.validate()
@@ -346,15 +345,11 @@ export default {
       }
 
       this.login(payload)
-        .then((response) => {
+        .then(() => {
           delete attemptsData[email]
           localStorage.setItem("loginAttempts", JSON.stringify(attemptsData))
 
-          const data = response.data
-          this.saveSessionLocalStorage(data)
-          this.authenticated = true
-          this.userId = data.user_id
-          this.$router.push("/tech-pharmacy")
+          this.$router.push("/tech-pharmacy");
         })
         .catch(() => {
           if (!attemptsData[email]) {
@@ -371,7 +366,7 @@ export default {
           }
 
           localStorage.setItem("loginAttempts", JSON.stringify(attemptsData))
-          this.loginError = true
+          this.loginError = true;
         })
         .finally(() => {
           this.loadingLogin = false

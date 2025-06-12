@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.context.annotation.Profile;
 
 import com.example.loginapp.entity.Bula;
 import com.example.loginapp.entity.Frequencia;
@@ -17,8 +17,8 @@ import com.example.loginapp.repository.FrequenciaRepository;
 import com.example.loginapp.repository.MedicamentoRepository;
 import com.example.loginapp.repository.UserRepository;
 
-@Configuration
-@Profile("test")
+// @Configuration
+// @Profile("test")
 public class TestConfig implements CommandLineRunner {
 
   @Autowired

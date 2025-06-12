@@ -9,7 +9,7 @@ const LOCAL_STORAGE_KEY = 'activeMedicationsV1';
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: undefined,
-    userId: 4,
+    userId: undefined,
     apiKey: undefined
   }),
   getters: {
@@ -21,33 +21,51 @@ export const useAuthStore = defineStore("auth", {
     getAuthenticated () {
       this.loadAuthenticatedAndUserIdStateFromLocalStorage()
     },
-    loadAuthenticatedAndUserIdStateFromLocalStorage () {
-      let userId = localStorage.getItem("userId")
-      let authenticated = false
+    loadAuthenticatedAndUserIdStateFromLocalStorage() {
+      const userId = localStorage.getItem("userId");
       if (userId) {
-        authenticated = true
+        this.authenticated = true;
+        this.userId = userId;
+      } else {
+        this.authenticated = false;
+        this.userId = null;
       }
-      this.authenticated = authenticated
-      this.userId = userId
     },
-    saveSessionLocalStorage (data) {
-      localStorage.setItem("userId", data.user_id)
+    saveSessionLocalStorage(data) {
+      localStorage.setItem("userId", data.user_id);
     },
-    removeSessionLocalStorage () {
-      localStorage.removeItem("userId")
-      localStorage.removeItem("apiKey")
+    removeSessionLocalStorage() {
+      localStorage.removeItem("userId");
+      localStorage.removeItem("apiKey");
     },
     getSessionFromLocalStorage () {
       const data = localStorage.getItem("userId")
       return data
     },
-    registerUser (data) {
-      const url = `${API_URL}/${API_USERS}/register`
-      return axios.post(url, data)
+    registerUser(data) {
+      const url = `${API_URL}/${API_USERS}/register`;
+      return axios.post(url, data);
     },
-    login(data) {
-      const url = `${API_URL}/${API_USERS}/login`
-      return axios.post(url, data)
+    async login(data) {
+      const url = `${API_URL}/${API_USERS}/login`;
+      try {
+        const response = await axios.post(url, data);
+        // Se a requisição for bem-sucedida, atualize o estado AQUI
+        this.saveSessionLocalStorage(response.data);
+        this.authenticated = true;
+        this.userId = response.data.user_id;
+        return response; // Retorna a resposta para o componente
+      } catch (error) {
+        // Em caso de erro, garanta que o estado está como "não autenticado"
+        this.authenticated = false;
+        this.userId = null;
+        throw error; // Lança o erro para o componente poder tratá-lo (ex: mostrar snackbar)
+      }
+    },
+    logout() {
+      this.removeSessionLocalStorage();
+      this.authenticated = false;
+      this.userId = null;
     },
   },
 });

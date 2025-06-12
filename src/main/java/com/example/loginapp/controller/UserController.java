@@ -1,12 +1,16 @@
-
 package com.example.loginapp.controller;
 
 import com.example.loginapp.dto.UserDTO;
 import com.example.loginapp.entity.User;
 import com.example.loginapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap; // Importar HashMap
+import java.util.Map;     // Importar Map
+import java.util.Optional; // Importar Optional
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,12 +31,18 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-        boolean authenticated = userService.login(userDTO.getEmail(), userDTO.getPassword());
-        if (authenticated) {
-            return ResponseEntity.ok("Login bem-sucedido!");
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDTO userDTO) {
+        Optional<User> userOptional = userService.login(userDTO.getEmail(), userDTO.getPassword());
+
+        Map<String, Object> responseBody = new HashMap<>();
+
+        if (userOptional.isPresent()) {
+            User loggedInUser = userOptional.get();
+            responseBody.put("user_id", loggedInUser.getId());
+            return ResponseEntity.ok(responseBody);
         } else {
-            return ResponseEntity.status(401).body("Credenciais inválidas.");
+            responseBody.put("error", "Credenciais inválidas.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
         }
     }
 }

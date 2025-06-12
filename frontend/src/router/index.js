@@ -78,32 +78,24 @@ const router = new VueRouter({
 })
 
 function handleRedirect (to, next, isPublicRoute, authenticated) {
-  const onlyLoggedOutRoute = to.matched.some(record => record.meta.public)
-  // no-logged try to access private route
   if (!isPublicRoute && !authenticated) {
     return next("/login")
   }
-  // logged try to access public route
-  if (authenticated && onlyLoggedOutRoute) {
+  if (authenticated && isPublicRoute) {
     return next("/tech-pharmacy/home")
   }
   return next()
 }
 
 router.beforeEach((to, from, next) => {
-  if (auth === 0) {
-    return next()
-  }
   const authStore = useAuthStore()
-  let authenticated = authStore.isAuthenticated
+
+  const authenticated = authStore.isAuthenticated 
   const isPublicRoute = to.matched.some(record => record.meta.public)
 
-  if (authenticated === undefined) {
-    authStore.loadAuthenticatedAndUserIdStateFromLocalStorage()
-    authenticated = authStore.isAuthenticated
-  }
+  console.log(`Valores da guarda -> isPublicRoute: ${isPublicRoute}, authenticated: ${authenticated}`);
+
   return handleRedirect(to, next, isPublicRoute, authenticated)
 })
-
 
 export default router;

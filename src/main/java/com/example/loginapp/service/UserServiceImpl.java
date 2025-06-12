@@ -1,4 +1,3 @@
-
 package com.example.loginapp.service;
 
 import com.example.loginapp.dto.UserDTO;
@@ -26,8 +25,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean login(String email, String password) {
+    public Optional<User> login(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
-        return userOpt.map(user -> user.getPassword().equals(password)).orElse(false);
+
+        if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
+            return userOpt;
+        }
+
+        return Optional.empty();
     }
 }
