@@ -2,8 +2,8 @@ import { defineStore } from "pinia"
 import axiosInstance from "@/http.js"
 const axios = axiosInstance
 
-export let API_URL = process.env.VUE_APP_API_URL
-export const API_USERS = `api/users`
+// export let API_URL = process.env.VUE_APP_API_URL
+export const API_USERS = `/api/users`
 const LOCAL_STORAGE_KEY = 'activeMedicationsV1';
 
 export const useAuthStore = defineStore("auth", {
@@ -43,11 +43,11 @@ export const useAuthStore = defineStore("auth", {
       return data
     },
     registerUser(data) {
-      const url = `${API_URL}/${API_USERS}/register`;
+      const url = `${API_USERS}/register`;
       return axios.post(url, data);
     },
     async login(data) {
-      const url = `${API_URL}/${API_USERS}/login`;
+      const url = `${API_USERS}/login`;
       try {
         const response = await axios.post(url, data);
         this.saveSessionLocalStorage(response.data);
@@ -139,7 +139,7 @@ export const useMedicationStore = defineStore("medication", {
         return;
       }
       try {
-        const response = await axios.get(`${API_URL}/api/bulas`);
+        const response = await axios.get(`/api/bulas`);
         const transformedData = response.data.map(bula => this.transformBulaToMedicamento(bula));
         this.medicamentos = transformedData;
       } catch (error) {
@@ -149,7 +149,7 @@ export const useMedicationStore = defineStore("medication", {
     },
     async fetchMedicationById(id) {
       try {
-        const response = await axios.get(`${API_URL}/api/bulas/${id}`);
+        const response = await axios.get(`/api/bulas/${id}`);
         this.selectedMedicationDetails = response.data;
         return response.data;
       } catch (error) {
@@ -168,7 +168,7 @@ export const useMedicationStore = defineStore("medication", {
         userId: parseInt(authStore.userId, 10),
       };
 
-      const url = `${API_URL}/api/medicamentos`;
+      const url = `/api/medicamentos`;
       
       return axios.post(url, payloadWithUser);
     },
@@ -183,7 +183,7 @@ export const useMedicationStore = defineStore("medication", {
       }
 
       try {
-        const url = `${API_URL}/api/medicamentos/usuario/${userId}`;
+        const url = `/api/medicamentos/usuario/${userId}`;
         const response = await axios.get(url);
         this.userConfiguredMedicamentos = response.data;
       } catch (error) {
@@ -192,7 +192,7 @@ export const useMedicationStore = defineStore("medication", {
       }
     },
     async recordDose(medicationId) {
-      const url = `${API_URL}/api/medicamentos/${medicationId}/doses`;
+      const url = `/api/medicamentos/${medicationId}/doses`;
       return axios.post(url);
     }
   },
