@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       notificationInterval: null,
-      notifiedDoses: new Set(), // Para não repetir notificações para a mesma dose
+      notifiedDoses: new Set(),
     }
   },
   computed: {
@@ -46,7 +46,6 @@ export default {
       const agora = new Date();
 
       this.userConfiguredMedicamentos.forEach(med => {
-        // Ignora tratamentos concluídos
         if (new Date(med.frequencia.dataTermino + 'T23:59:59') < agora) return;
         if (!med.doses || med.doses.length === 0) return;
 
@@ -59,20 +58,16 @@ export default {
         const diffMillis = proximaDoseEsperada.getTime() - agora.getTime();
         const diffMinutes = Math.round(diffMillis / 60000);
 
-        // >>>>> LÓGICA DE LEMBRETE (NOVA) <<<<<
-        // Se a dose for nos próximos 15 minutos E ainda não foi notificada
         if (diffMinutes > 0 && diffMinutes <= 15) {
           if (!this.notifiedDoses.has(doseKey)) {
             this.addNotification({
               mensagem: `Lembrete: Sua dose de ${med.nome} é em aproximadamente ${diffMinutes} min.`,
-              tipo: 'LEMBRETE_DOSE' // Novo tipo de notificação
+              tipo: 'LEMBRETE_DOSE'
             });
             this.notifiedDoses.add(doseKey);
           }
         }
 
-        // >>>>> LÓGICA DE DOSE ATRASADA (EXISTENTE) <<<<<
-        // Se a dose estiver atrasada há mais de 1 hora E ainda não foi notificada
         const umaHoraDepois = new Date(proximaDoseEsperada.getTime() + 3600 * 1000);
         if (agora > umaHoraDepois) {
           if (!this.notifiedDoses.has(doseKey)) {
@@ -91,7 +86,7 @@ export default {
     await this.fetchNotifications();
     await this.fetchUserConfiguredMedicamentos();
 
-    this.notificationInterval = setInterval(this.checkMedicationStatus, 60000); // Roda a cada 60 segundos
+    this.notificationInterval = setInterval(this.checkMedicationStatus, 60000);
   },
   beforeDestroy() {
     clearInterval(this.notificationInterval);

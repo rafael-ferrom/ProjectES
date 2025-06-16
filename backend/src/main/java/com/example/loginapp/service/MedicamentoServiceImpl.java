@@ -33,7 +33,6 @@ public class MedicamentoServiceImpl implements MedicamentoService {
   private final UserRepository userRepository;
   private final BulaRepository bulaRepository;
   private final DoseRepository doseRepository;
-  // >>>>> ALTERAÇÃO AQUI <<<<<
   private final EstoqueRepository estoqueRepository;
 
   @Autowired
@@ -43,7 +42,6 @@ public class MedicamentoServiceImpl implements MedicamentoService {
     this.userRepository = userRepository;
     this.bulaRepository = bulaRepository;
     this.doseRepository = doseRepository;
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     this.estoqueRepository = estoqueRepository;
   }
 
@@ -85,14 +83,12 @@ public class MedicamentoServiceImpl implements MedicamentoService {
   @Override
   @Transactional
   public void registrarDose(Long medicamentoId) {
-    // 1. Encontrar o plano de tratamento (Medicamento)
     Medicamento medicamento = medicamentoRepository.findById(medicamentoId)
         .orElseThrow(() -> new RuntimeException("Plano de tratamento não encontrado."));
 
     User user = medicamento.getUser();
     Bula bula = medicamento.getBula();
 
-    // 2. Encontrar uma caixa de remédio disponível (primeiro que vence)
     Sort sortByValidade = Sort.by(Sort.Direction.ASC, "dataValidade");
     List<EstoqueMedicamento> estoquesDisponiveis = estoqueRepository.findByUserAndBulaAndStatusAndDataValidadeAfter(
       user, bula, EstoqueStatus.DISPONIVEL, LocalDate.now().minusDays(1), sortByValidade);
@@ -103,10 +99,8 @@ public class MedicamentoServiceImpl implements MedicamentoService {
 
     EstoqueMedicamento caixaAtual = estoquesDisponiveis.get(0);
 
-    // 3. Abater a dose e atualizar o estoque
     int comprimidosRestantes = caixaAtual.getQuantidadeComprimidos();
     if (comprimidosRestantes <= 0) {
-      // Isso não deveria acontecer com a query atual, mas é uma boa verificação
       throw new RuntimeException("Erro de consistência: Caixa marcada como disponível está vazia.");
     }
 
@@ -117,12 +111,10 @@ public class MedicamentoServiceImpl implements MedicamentoService {
     }
     estoqueRepository.save(caixaAtual);
     
-    // 4. Registrar a dose, vinculando ao plano e à caixa
     Dose novaDose = new Dose(medicamento, caixaAtual);
     doseRepository.save(novaDose);
   }
 
-  // >>>>> NOVO MÉTODO <<<<<
   @Override
   @Transactional
   public List<EstoqueMedicamento> comprarMedicamento(CompraDTO compraDTO) {
@@ -149,7 +141,6 @@ public class MedicamentoServiceImpl implements MedicamentoService {
       return estoqueRepository.saveAll(caixasCompradas);
   }
     
-  // >>>>> NOVO MÉTODO <<<<<
   @Override
   public List<EstoqueMedicamento> listarEstoquePorUsuario(Long userId) {
       User user = userRepository.findById(userId)

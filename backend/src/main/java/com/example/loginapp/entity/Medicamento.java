@@ -32,8 +32,6 @@ public class Medicamento {
     @JoinColumn(name = "frequencia_id")
     private Frequencia frequencia;
 
-    // >>>>> ALTERAÇÃO PRINCIPAL AQUI <<<<<
-    // Mudado de @OneToOne para @ManyToOne e removido o cascade.
     @ManyToOne 
     @JoinColumn(name = "bula_id")
     private Bula bula;
@@ -42,7 +40,6 @@ public class Medicamento {
     @JsonManagedReference 
     private List<Instrucao> instrucoes = new ArrayList<>();
 
-    // A relação com Dose foi movida para o final para manter a consistência
     @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Dose> doses = new ArrayList<>();
@@ -71,7 +68,6 @@ public class Medicamento {
         this.instrucoes.add(instrucao);
     }
 
-    // Getters e Setters (sem alterações)
     public Long getId() {
         return id;
     }

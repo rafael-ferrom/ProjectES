@@ -66,7 +66,6 @@
 </template>
 
 <script>
-// O comentário para desabilitar o eslint foi removido pois não é mais necessário com a nova sintaxe.
 import { useMedicationStore } from "@/store";
 import { mapState, mapActions } from "pinia";
 
@@ -107,12 +106,10 @@ export default {
     ...mapActions(useMedicationStore, ['fetchUserStock']),
     formatDate(dateString) {
       if (!dateString) return 'N/A';
-      // Para datas sem hora, precisamos adicionar a hora para evitar problemas de fuso
       const date = new Date(dateString + 'T00:00:00Z');
 
-      // >>>>> CORREÇÃO AQUI <<<<<
       return new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Sao_Paulo', // Garante que a data seja interpretada corretamente
+        timeZone: 'America/Sao_Paulo',
         year: 'numeric', month: 'long', day: 'numeric'
       }).format(date);
     },

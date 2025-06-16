@@ -275,43 +275,6 @@ export default {
     ...mapActions(useAuthStore, [
       "login"
     ]),
-    validate () {
-      this.$refs.form.validate()
-      if (this.formValid) {
-        this.loadingLogin = true
-        if (this.username === "hedge" && this.password === "hedge@1234"){
-          this.authenticated = true
-          this.$router.push("/console/home")
-          return
-        }
-        this.loginError = true
-        this.errorMessage = "User authentication failed: invalid credentials"
-        // const data = {
-        //   username: this.username,
-        //   // eslint-disable-next-line
-        //   password: md5(this.password.trim())
-        // }
-        // this.login(data)
-        //   .then((response) => {
-        //     const data = response.data
-        //     const userId = data.user_id
-        //     this.authenticated = true
-        //     this.userId = userId
-        //     this.saveSessionLocalStorage(data)
-        //     this.$router.push("/console/home")
-        //   })
-        //   .catch((error) => {
-        //     if (error.response && error.response.status === 401) {
-        //       this.loginError = true
-        //       this.errorMessage = "User authentication failed: invalid credentials"
-        //       console.log(error)
-        //     }
-        //   })
-        //   .finally(() => {
-        //     this.loadingLogin = false
-        //   })
-      }
-    },
     changeLanguage(lang) {
       this.$i18n.locale = lang
       localStorage.setItem('userLanguage', lang)

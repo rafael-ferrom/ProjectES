@@ -28,7 +28,6 @@ public class Bula {
   private String apresentacao;
   private String fabricante;
 
-  // NEW: Field for the medicine photo URL
   private String fotoUrl;
 
   @ElementCollection
@@ -53,8 +52,6 @@ public class Bula {
   public void adicionarInstrucao(String instrucao) {
     this.instrucoes.add(instrucao);
   }
-
-  // Getters and Setters for all fields
 
   public Long getId() {
     return id;
@@ -120,7 +117,6 @@ public class Bula {
     this.instrucoes = instrucoes;
   }
 
-  // NEW: Getter and Setter for fotoUrl
   public String getFotoUrl() {
     return fotoUrl;
   }

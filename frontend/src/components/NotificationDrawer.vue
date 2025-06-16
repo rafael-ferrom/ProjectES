@@ -57,10 +57,8 @@ export default {
     ...mapActions(useNotificationStore, ['toggleDrawer']),
     formatTimestamp(timestamp) {
       if (!timestamp) return '';
-      const date = new Date(timestamp + 'Z'); // Adiciona 'Z' para indicar que a string é UTC
+      const date = new Date(timestamp + 'Z');
 
-      // >>>>> CORREÇÃO AQUI <<<<<
-      // Usa a API Intl para formatar a data para o fuso de Brasília
       return new Intl.DateTimeFormat('pt-BR', {
         timeZone: 'America/Sao_Paulo',
         year: 'numeric',

@@ -16,11 +16,10 @@ public class Notificacao {
     private User user;
 
     private String mensagem;
-    private String tipo; // Ex: 'ALERTA_DOSE', 'DOSE_ATRASADA'
+    private String tipo;
     private LocalDateTime timestamp;
     private boolean lida = false;
 
-    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }

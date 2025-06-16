@@ -16,7 +16,6 @@ public interface EstoqueRepository extends JpaRepository<EstoqueMedicamento, Lon
     
     List<EstoqueMedicamento> findByUserAndBula(User user, Bula bula);
 
-    // Encontra o estoque disponível para um usuário e bula, ordenado pela data de validade mais próxima
     List<EstoqueMedicamento> findByUserAndBulaAndStatusAndDataValidadeAfter(
         User user, Bula bula, EstoqueStatus status, LocalDate data, org.springframework.data.domain.Sort sort
     );

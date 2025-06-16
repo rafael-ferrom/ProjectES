@@ -17,12 +17,12 @@ services:
     # docker run --name sqlserver-dev -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=SuaSenhaForte_123!" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
 
   db-init:
-    image: mcr.microsoft.com/mssql/server:2019-latest # Use the same image to ensure sqlcmd is available
+    image: mcr.microsoft.com/mssql/server:2019-latest
     depends_on:
       db:
-        condition: service_healthy # This ensures db-init only runs when 'db' is healthy
+        condition: service_healthy
     user: "0"
-    entrypoint: [] # Set entrypoint to a shell
+    entrypoint: []
     command:
       - "/bin/bash"
       - "-ec"
@@ -35,8 +35,6 @@ services:
         else
           echo 'Database already initialized.'
         fi
-    # Set to 'no' to ensure this service exits after its command completes successfully
-    # If the command fails, it will not restart.
     restart: "no"
 
   backend:
@@ -45,10 +43,8 @@ services:
       dockerfile: ./backend/Dockerfile
     restart: on-failure
     depends_on:
-      # db:
-      #   condition: service_healthy
       db-init:
-        condition: service_completed_successfully # Backend starts only after db-init finishes successfully
+        condition: service_completed_successfully
     environment:
       SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=ProjectES_DB;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
@@ -67,13 +63,11 @@ services:
     restart: always
     ports:
       - "80:80"
-      # >>> ALTERAÇÃO AQUI: Mapeia a porta 443 da VM para a 443 do contêiner <<<
       - "443:443" 
     depends_on:
       - backend
-    # >>> NOVO: Compartilha os certificados SSL com o contêiner <<<
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro # 'ro' = read-only, mais seguro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
 
 volumes:
   sqlserver_data:
