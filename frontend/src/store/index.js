@@ -118,6 +118,8 @@ export const useMedicationStore = defineStore("medication", {
     medicamentos: [],
     selectedMedicationDetails: null,
     userConfiguredMedicamentos: [],
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    userStock: [],
     nearbyPharmacies: [],
     isLoadingPharmacies: false,
     pharmacySearchError: null,
@@ -126,6 +128,16 @@ export const useMedicationStore = defineStore("medication", {
     getAllMedicamentos: (state) => state.medicamentos,
     getMedicamentoById: (state) => {
       return (id) => state.medicamentos.find((medicamento) => medicamento.id == id);
+    },
+    // >>>>> NOVO GETTER <<<<<
+    getStockForBula: (state) => (bulaId) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const relevantStock = state.userStock.filter(item => item.bula.id === bulaId && item.status === 'DISPONIVEL' && item.dataValidade >= today);
+        const totalPills = relevantStock.reduce((acc, item) => acc + item.quantidadeComprimidos, 0);
+        return {
+            totalPills,
+            boxes: relevantStock,
+        };
     },
     getNearbyPharmacies: (state) => state.nearbyPharmacies,
     getIsLoadingPharmacies: (state) => state.isLoadingPharmacies,
@@ -137,7 +149,9 @@ export const useMedicationStore = defineStore("medication", {
         fotoLink: bula.fotoUrl,
         nome: `${bula.nomeComercial} ${bula.concentracao}`,
         descricao: `Um medicamento baseado em ${bula.principioAtivo}. Apresentado em uma ${bula.apresentacao.toLowerCase()}.`,
-        informacoesDeUso: `Siga as instruções médicas para ${bula.nomeComercial}.`
+        informacoesDeUso: `Siga as instruções médicas para ${bula.nomeComercial}.`,
+        // >>>>> ALTERAÇÃO AQUI <<<<<
+        comprimidosPorCaixa: parseInt(bula.apresentacao.match(/\d+/)[0], 10) || 20 // Extrai número de comprimidos
       };
     },
     async fetchMedicamentos() {
@@ -199,7 +213,55 @@ export const useMedicationStore = defineStore("medication", {
     },
     async recordDose(medicationId) {
       const url = `/api/medicamentos/${medicationId}/doses`;
-      return axios.post(url);
+      // A chamada ao backend não muda, mas vamos atualizar o estoque depois
+      try {
+        const response = await axios.post(url);
+        // Após registrar a dose, buscar o estoque e os tratamentos novamente para refletir as mudanças
+        await this.fetchUserStock();
+        await this.fetchUserConfiguredMedicamentos();
+        return response;
+      } catch (error) {
+        console.error("Erro ao registrar dose:", error.response?.data || error.message);
+        // Propaga o erro para que a view possa tratá-lo (ex: mostrar snackbar)
+        throw new Error(error.response?.data?.message || "Não foi possível registrar a dose. Verifique seu estoque.");
+      }
+    },
+    // >>>>> NOVA AÇÃO <<<<<
+    async fetchUserStock() {
+        const authStore = useAuthStore();
+        const userId = authStore.userId;
+        if (!userId) {
+            this.userStock = [];
+            return;
+        }
+        try {
+            const response = await axios.get(`/api/estoque/usuario/${userId}`);
+            this.userStock = response.data;
+        } catch (error) {
+            console.error("Falha ao buscar estoque do usuário:", error);
+            this.userStock = [];
+        }
+    },
+    // >>>>> NOVA AÇÃO <<<<<
+    async purchaseMedication(purchasePayload) {
+        const authStore = useAuthStore();
+        if (!authStore.userId) {
+            throw new Error("Usuário não está autenticado para comprar.");
+        }
+        const payload = {
+            ...purchasePayload,
+            userId: parseInt(authStore.userId, 10),
+        };
+        const url = `/api/estoque/comprar`;
+        try {
+          const response = await axios.post(url, payload);
+          // Após a compra, atualiza o estoque local
+          await this.fetchUserStock();
+          return response;
+        } catch (error) {
+          console.error("Erro ao realizar compra:", error);
+          throw error;
+        }
     },
     getCurrentLocation() {
       return new Promise((resolve, reject) => {

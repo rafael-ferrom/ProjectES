@@ -16,7 +16,7 @@
           <v-icon 
             class="mx-2"
             :color="panel === undefined ? 'grey darken-4' : 'alive'"
-          >``
+          >
             mdi-help-circle
           </v-icon>
           <span 

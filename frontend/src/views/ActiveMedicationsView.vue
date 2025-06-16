@@ -30,6 +30,16 @@
             {{ med.dosagem }} &ndash; {{ med.tipo }}
           </v-card-subtitle>
 
+          <v-alert
+            :type="med.stock.alertType"
+            dense text border="left" class="mx-4"
+          >
+            <strong>Estoque:</strong> {{ med.stock.message }}
+            <div v-if="med.stock.isExpired" class="mt-1 text-caption">
+                Validade da caixa atual: {{ formatDate(med.stock.expiryDate) }}
+            </div>
+          </v-alert>
+
           <v-divider></v-divider>
 
           <v-card-text class="flex-grow-1">
@@ -77,23 +87,29 @@
           </v-card-text>
 
           <v-divider></v-divider>
-
+          
           <v-card-actions class="d-flex flex-column align-stretch pa-0">
               <div class="pa-4 text-center">
                 <div v-if="med.isCompleted" class="text-center success--text font-weight-bold">
                     <v-icon color="success">mdi-check-all</v-icon> Tratamento Concluído!
                 </div>
-                <v-btn v-else-if="!med.isStarted" color="success" large block @click="handleRecordDose(med.id)" :loading="med.isRecording">
-                    <v-icon left>mdi-play-circle</v-icon> Tomar 1ª Dose
-                </v-btn>
-                <v-btn v-else color="success" large block @click="handleRecordDose(med.id)" :loading="med.isRecording" :disabled="!med.isDoseDue">
-                    <v-icon left>mdi-plus-circle</v-icon> Tomar Próxima Dose
+                <v-btn
+                  v-else
+                  color="success"
+                  large
+                  block
+                  @click="handleRecordDose(med.id)"
+                  :loading="med.isRecording"
+                  :disabled="!med.canTakeDose"
+                >
+                  <v-icon left>{{ med.isStarted ? 'mdi-plus-circle' : 'mdi-play-circle' }}</v-icon>
+                  {{ med.isStarted ? 'Tomar Próxima Dose' : 'Tomar 1ª Dose' }}
                 </v-btn>
               </div>
 
               <v-expansion-panels flat class="mt-0">
                 <v-expansion-panel>
-                  <v-expansion-panel-header>Medication Info & Instructions</v-expansion-panel-header>
+                  <v-expansion-panel-header>Info & Instruções</v-expansion-panel-header>
                   <v-expansion-panel-content>
                     <strong>{{ med.bula.nomeComercial }} ({{ med.bula.principioAtivo }})</strong>
                     <p class="text-caption grey--text">{{ med.bula.fabricante }} - {{ med.bula.apresentacao }}</p>
@@ -109,12 +125,15 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="5000">
+        {{ snackbar.text }}
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
 import { useMedicationStore } from "@/store/index.js";
-import { mapState, mapActions } from 'pinia';
+import { mapState, mapActions, mapGetters } from 'pinia';
 
 export default {
   name: 'ActiveMedicationsView',
@@ -123,12 +142,17 @@ export default {
       loading: true,
       now: new Date(),
       timer: null,
+      snackbar: { show: false, text: '', color: '' },
     }
   },
   computed: {
     ...mapState(useMedicationStore, ['userConfiguredMedicamentos']),
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    ...mapGetters(useMedicationStore, ['getStockForBula']),
 
     processedMedications() {
+      const today = new Date().toISOString().slice(0, 10);
+
       return this.userConfiguredMedicamentos.map(med => {
         const sortedDoses = [...med.doses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         const lastDose = sortedDoses.length > 0 ? sortedDoses[0] : null;
@@ -152,35 +176,70 @@ export default {
         const dosesTaken = med.doses.length;
         const doseProgress = totalDosesInTreatment > 0 ? (dosesTaken / totalDosesInTreatment) * 100 : 0;
         
+        // >>>>> NOVA LÓGICA DE ESTOQUE <<<<<
+        const stockInfo = this.getStockForBula(med.bula.id);
+        const hasStock = stockInfo.totalPills > 0;
+        const currentBox = stockInfo.boxes.sort((a,b) => new Date(a.dataValidade) - new Date(b.dataValidade))[0];
+        const isCurrentBoxExpired = currentBox ? currentBox.dataValidade < today : false;
+        
+        let stockMessage = 'Sem estoque. Compre mais.';
+        let alertType = 'error';
+        if(hasStock) {
+            const totalBoxes = stockInfo.boxes.length;
+            stockMessage = `${stockInfo.totalPills} comprimidos em ${totalBoxes} caixa(s).`;
+            alertType = 'success';
+            if (stockInfo.totalPills < med.frequencia.vezesPorDia * 3) { // Aviso de estoque baixo (ex: < 3 dias)
+                alertType = 'warning';
+                stockMessage += ' (Estoque baixo!)';
+            }
+        }
+        if (isCurrentBoxExpired) {
+            stockMessage = 'Caixa atual está vencida!';
+            alertType = 'error';
+        }
+
         return {
           ...med,
           isRecording: false,
           isStarted,
           lastDose,
           nextDoseTime,
-          isDoseDue: nextDoseTime ? this.now >= nextDoseTime : false,
+          isDoseDue: nextDoseTime ? this.now >= nextDoseTime : true,
           isCompleted: this.now > endDate || (totalDosesInTreatment > 0 && dosesTaken >= totalDosesInTreatment),
           dosesTaken,
           totalDosesInTreatment,
           doseProgress: Math.min(100, doseProgress),
+          stock: {
+              hasStock,
+              isExpired: isCurrentBoxExpired,
+              expiryDate: currentBox?.dataValidade,
+              message: stockMessage,
+              alertType
+          },
+          canTakeDose: hasStock && !isCurrentBoxExpired && (nextDoseTime ? this.now >= nextDoseTime : true),
         };
       });
     }
   },
   methods: {
-    ...mapActions(useMedicationStore, ['fetchUserConfiguredMedicamentos', 'recordDose']),
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    ...mapActions(useMedicationStore, ['fetchUserConfiguredMedicamentos', 'recordDose', 'fetchUserStock']),
     
     async handleRecordDose(medicationId) {
-        const med = this.userConfiguredMedicamentos.find(m => m.id === medicationId);
-        if (med) this.$set(med, 'isRecording', true);
+        const med = this.processedMedications.find(m => m.id === medicationId);
+        if (!med) return;
+        
+        med.isRecording = true; // Usa a propriedade computada para o feedback de loading
         
         try {
             await this.recordDose(medicationId);
-            await this.fetchUserConfiguredMedicamentos();
+            this.snackbar = { show: true, text: 'Dose registrada com sucesso!', color: 'success' };
+            // Os dados já são atualizados dentro da ação `recordDose` na store
         } catch (error) {
             console.error("Failed to record dose:", error);
+            this.snackbar = { show: true, text: error.message || "Erro ao registrar dose.", color: 'error' };
         } finally {
-            if (med) this.$set(med, 'isRecording', false);
+            med.isRecording = false;
         }
     },
 
@@ -190,16 +249,19 @@ export default {
       return new Date(dateString).toLocaleString('pt-BR', options);
     },
     
-    // NOVO: Método para formatar apenas a data
     formatDate(dateString) {
       if (!dateString) return 'N/A';
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      // Adiciona T00:00:00 para evitar problemas com fuso horário
       return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', options);
     }
   },
   async mounted() {
-    await this.fetchUserConfiguredMedicamentos();
+    this.loading = true;
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    await Promise.all([
+        this.fetchUserConfiguredMedicamentos(),
+        this.fetchUserStock()
+    ]);
     this.loading = false;
     this.timer = setInterval(() => { this.now = new Date(); }, 1000);
   },

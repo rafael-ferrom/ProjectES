@@ -9,6 +9,8 @@ import ActiveMedicationsView from "./../views/ActiveMedicationsView.vue";
 import PharmacySelectionView from './../views/PharmacySelectionView.vue';
 import RegisterView from "./../views/RegisterView.vue";
 import NotFoundView from './../views/NotFoundView.vue';
+// >>>>> NOVA IMPORTAÇÃO AQUI <<<<<
+import InventoryView from './../views/InventoryView.vue';
 import { useAuthStore } from "./../store/index";
 
 // const auth = Number(process.env.VUE_APP_AUTH);
@@ -68,6 +70,12 @@ const routes = [
         name: 'PharmacySelection',
         component: PharmacySelectionView,
         props: true
+      },
+      // >>>>> NOVA ROTA AQUI <<<<<
+      {
+        path: 'inventory',
+        name: 'inventory',
+        component: InventoryView,
       },
     ]
   },

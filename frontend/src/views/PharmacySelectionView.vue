@@ -13,7 +13,13 @@
               <v-icon large left color="primary">mdi-pill</v-icon>
               Comprar: {{ medicamento.nome }}
             </v-card-title>
-            <v-card-subtitle>Defina a quantidade e escolha a farmácia mais próxima.</v-card-subtitle>
+            <v-card-subtitle>
+              Defina a quantidade e escolha a farmácia mais próxima.
+              <div v-if="currentStock.totalPills > 0" class="mt-2 text-body-1 blue--text text--darken-2">
+                <v-icon color="blue">mdi-information</v-icon>
+                Você possui <strong>{{ currentStock.totalPills }}</strong> comprimidos em estoque.
+              </div>
+            </v-card-subtitle>
             
             <v-divider class="mx-4"></v-divider>
 
@@ -84,15 +90,20 @@
 
     <v-dialog v-model="dialogConfirmacao" max-width="500px">
       <v-card>
+        <v-overlay :value="isPurchasing" absolute>
+          <v-progress-circular indeterminate size="50"></v-progress-circular>
+        </v-overlay>
         <v-card-title class="text-h5">Confirmar Pedido</v-card-title>
         <v-card-text class="text-body-1">
-          Confirma o pedido de <strong>{{ quantidade }}x {{ medicamento?.nome }}</strong> na farmácia
+          Confirma a compra de <strong>{{ quantidade }}x {{ medicamento?.nome }}</strong> na farmácia
           <br><strong>{{ farmaciaSelecionada?.name }}</strong>?
+          <br><br>
+          <small>(O medicamento terá validade de 2 anos a partir da data da compra)</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="dialogConfirmacao = false">Cancelar</v-btn>
-          <v-btn color="success" @click="executarCompraMockada">Confirmar Pedido</v-btn>
+          <v-btn color="success" @click="executarCompra">Confirmar Compra</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -101,10 +112,10 @@
       <v-card>
         <v-card-title class="text-h5 success--text">
           <v-icon color="success" left>mdi-check-circle-outline</v-icon>
-          Pedido Enviado!
+          Compra Realizada!
         </v-card-title>
         <v-card-text>
-          Seu pedido simulado foi enviado. Um entregador (imaginário) está a caminho!
+          Seu pedido foi processado e o estoque atualizado.
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -113,12 +124,16 @@
       </v-card>
     </v-dialog>
 
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="4000">
+        {{ snackbar.text }}
+    </v-snackbar>
+
   </v-container>
 </template>
 
 <script>
 /* global google */
-import { mapState, mapActions } from 'pinia';
+import { mapState, mapActions, mapGetters } from 'pinia';
 import { useMedicationStore } from '@/store';
 
 export default {
@@ -137,6 +152,9 @@ export default {
       dialogSucesso: false,
       farmaciaSelecionada: null,
       map: null, // Guarda a instância do mapa
+      // >>>>> ALTERAÇÃO AQUI <<<<<
+      isPurchasing: false,
+      snackbar: { show: false, text: '', color: '' },
     };
   },
   computed: {
@@ -145,61 +163,78 @@ export default {
       isLoadingPharmacies: 'isLoadingPharmacies',
       pharmacySearchError: 'pharmacySearchError',
       medicamentos: 'medicamentos',
-      getMedicamentoById: 'getMedicamentoById',
     }),
+    ...mapGetters(useMedicationStore, ['getMedicamentoById', 'getStockForBula']),
     medicamento() {
+      // Usa o getter para encontrar o medicamento da lista geral
       return this.getMedicamentoById(this.medicationId);
     },
+    // >>>>> NOVO COMPUTED <<<<<
+    currentStock() {
+        if (!this.medicamento) return { totalPills: 0, boxes: [] };
+        return this.getStockForBula(this.medicamento.id);
+    }
   },
   methods: {
-    ...mapActions(useMedicationStore, ['findNearbyPharmacies', 'fetchMedicamentos']),
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    ...mapActions(useMedicationStore, ['findNearbyPharmacies', 'fetchMedicamentos', 'purchaseMedication', 'fetchUserStock']),
 
     abrirDialogConfirmacao(farmacia) {
       this.farmaciaSelecionada = farmacia;
       this.dialogConfirmacao = true;
     },
-    executarCompraMockada() {
-      this.dialogConfirmacao = false;
-      this.dialogSucesso = true;
+    async executarCompra() {
+        this.isPurchasing = true;
+        const payload = {
+            bulaId: this.medicamento.id,
+            numeroDeCaixas: this.quantidade,
+            // A quantidade de comprimidos é extraída da bula/medicamento
+            comprimidosPorCaixa: this.medicamento.comprimidosPorCaixa,
+            validadeEmAnos: 2, // Hardcoded conforme solicitado
+        };
+
+        try {
+            await this.purchaseMedication(payload);
+            this.dialogConfirmacao = false;
+            this.dialogSucesso = true;
+        } catch (error) {
+            this.snackbar = { show: true, text: 'Erro ao processar a compra.', color: 'error' };
+            this.dialogConfirmacao = false;
+        } finally {
+            this.isPurchasing = false;
+        }
     },
     fecharDialogSucesso() {
       this.dialogSucesso = false;
       this.$router.push('/tech-pharmacy/home');
     },
     
-    // >>>>> MÉTODO CORRIGIDO E FUNCIONAL <<<<<
     renderMap() {
       if (this.farmacias.length === 0 || !window.google) {
         return;
       }
 
-      // Pega a localização da primeira farmácia para centrar o mapa
       const centerLocation = this.farmacias[0].location;
-
       const mapElement = document.getElementById('pharmacy-map');
       if (!mapElement) return;
 
-      // Cria a instância do mapa
       this.map = new google.maps.Map(mapElement, {
         center: centerLocation,
-        zoom: 14, // Um bom zoom inicial
-        mapId: 'TECH_PHARMACY_MAP', // Um ID para o mapa
+        zoom: 14,
+        mapId: 'TECH_PHARMACY_MAP',
       });
       
       const bounds = new google.maps.LatLngBounds();
 
-      // Adiciona um marcador para cada farmácia
       this.farmacias.forEach(farmacia => {
         const marker = new google.maps.Marker({
           position: farmacia.location,
           map: this.map,
           title: farmacia.name,
         });
-        // Estende os limites do mapa para incluir este marcador
         bounds.extend(marker.getPosition());
       });
 
-      // Ajusta o zoom e o centro do mapa para mostrar todos os marcadores
       if (this.farmacias.length > 1) {
         this.map.fitBounds(bounds);
       }
@@ -217,11 +252,12 @@ export default {
   async mounted() {
     this.isPageLoading = true;
     
-    if (this.medicamentos.length === 0) {
-      await this.fetchMedicamentos();
-    }
-
-    await this.findNearbyPharmacies();
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    await Promise.all([
+        this.medicamentos.length === 0 ? this.fetchMedicamentos() : Promise.resolve(),
+        this.fetchUserStock(),
+        this.findNearbyPharmacies()
+    ]);
     
     this.isPageLoading = false;
   },

@@ -19,7 +19,7 @@
           <v-img
             aspect-ratio="16/9"
             height="80"
-            :src="require(`../assets/logo.jpg`)"
+            :src="require(`../assets/logo-tech.png`)"
             max-width="150"
             min-width="150"
             contain
@@ -37,67 +37,11 @@
           </div>
         </div>
 
-        <!-- <div
-          class="d-flex align-center"
-          style="overflow: auto hidden"
-        > -->
-          <!-- <v-slide-group
-            class="d-flex mb-n3"
-            style="width: 255px;"
-            show-arrows
-          >
-            <v-slide-item
-              v-for="(sparkline, ticker, index) in sparklineListIntraday"
-              :key="index"
-            >
-              <sparkline-chart 
-                :sparklineData="sparkline"
-                :ticker="ticker"
-                style="min-width: 150px;"
-              >
-              </sparkline-chart>
-            </v-slide-item>
-          </v-slide-group> -->
-
-        <!-- </div> -->
-
-        
-
         <v-menu
           open-on-hover
           bottom
           offset-y
         >
-          <!-- <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              class="my-auto ml-12"
-              v-bind="attrs"
-              v-on="on"
-              icon
-            >
-            <v-img
-              v-if="isPtBRLocale"
-              style="height: 32px;"
-              content-class="rounded-lg"
-              class="rounded-lg"
-              aspect-ratio="16/9"
-              max-width="32"
-              width="32"
-              :src="require(`./../assets/brazil_flag.png`)"
-            />
-            <v-img
-              v-else
-              style="height: 32px;"
-              content-class="rounded-lg"
-              class="rounded-lg"
-              aspect-ratio="16/9"
-              max-width="32"
-              width="32"
-              :src="require(`./../assets/usd_flag.png`)"
-            />
-            </v-btn>
-          </template> -->
-
           <v-list>
             <v-list-item link @click="changeLanguage('en')">
               <v-img
@@ -160,46 +104,6 @@
     </div>
 
     <template v-slot:extension>
-      <!-- <v-tabs
-        v-model="tab"
-        dense
-        background-color="#121212"
-        :slider-size="5"
-        :height="40"
-        class="mt-3"
-        style="border-bottom: 1px solid gray"
-        show-arrows
-      >
-        <v-tab
-          v-for="(menu, index) in menus"
-          :key="index"
-          :disabled="menu.disabled"
-          :to="menu.to"
-        >
-          <span 
-            class="white--text text-capitalize"
-            style="font-weight: 400;"
-          >
-            {{ menu.label }}
-          </span>
-        </v-tab>
-        <v-spacer></v-spacer>
-        <v-chip color="#212121" class="mr-2">
-          <v-switch
-            v-model="isMockDataOn"
-            color="primary"
-            @change="onSwitchChange()"
-            hide-details
-          ></v-switch>
-          <span 
-            class="white--text text-capitalize"
-            style="font-weight: 400;"
-            :style="{ fontWeight: getIsMockDataOn ? 'bold' : 'normal' }"
-          >
-            {{ $t('toolbar.testMode') }}
-          </span>
-        </v-chip>
-      </v-tabs> -->
       <v-card class="mt-4 d-flex" style="width: 100%; background-color: #ededeb;">
         <div class="d-flex" style="background-color: #ededeb; height: 40px;">
           <template v-for="(menus, index) in menusList">
@@ -208,7 +112,7 @@
               :to="menus.menus[0].to"
               class="d-flex align-center px-4 text-decoration-none hoverable-menu"
               style="background-color: #ededeb;"
-              :style="{ ...isActiveMenu(menus.menus), width: index === 1 ? '200px' : '140px' }"
+              :style="{ ...isActiveMenu(menus.menus), width: 'auto' }"
             >
               <span class="font-weight-bold">{{ menus.title }}</span>
             </router-link>
@@ -238,7 +142,6 @@
 </template>
 
 <script>
-// import { mapActions, mapWritableState } from "pinia"
 import { mapActions, mapState, mapWritableState } from "pinia"
 import { useAuthStore } from "./../store/index"
 
@@ -250,15 +153,6 @@ export default {
       tab: 0,
       logoutError: false,
       errorMessage: undefined,
-      // menus: [
-      //   { label: this.$t('menus.fxmarket'), to: "/grid/fxmarket" },
-      //   { label: this.$t('menus.trading'), to: "/grid/trading" },
-      //   { label: this.$t('menus.reports'), to: "/grid/reports" },
-      //   { label: "Monitoring (TBR)", disabled: true },
-      //   { label: "IP Allowlist (TBR)", disabled: true },
-      //   { label: "Session (TBR)", disabled: true },
-      //   { label: "Notifications (TBR)", disabled: true }
-      // ],
       eventSource: undefined,
       GRIDPretty: "",
       GRIDPROPretty: "PRO",
@@ -288,10 +182,8 @@ export default {
     isActiveMenu(menuList) {
       const isCurrentRoute = menuList.some(menu => menu.to === this.$route.path)
 
-      const isCurvesRoute = this.$route.path === "/grid/home-curves/curves"
-
-      if (isCurrentRoute || (isCurvesRoute && menuList.some(menu => menu.to.includes('/grid/home-curves')))) {
-        return { borderBottom: '5px solid #ff1844' }
+      if (isCurrentRoute) {
+        return { borderBottom: '5px solid #1976D2' } // Usando a cor primária do Vuetify
       }
 
       return {}
@@ -299,7 +191,6 @@ export default {
   },
   computed: {
     ...mapWritableState(useAuthStore, [
-      // "authenticated",
       "userId"
     ]),
     ...mapState(useAuthStore, [
@@ -311,15 +202,22 @@ export default {
     menusList() {
       return [
         {
-          title: this.$t("menus.home"),
+          title: "Início",
           menus: [
-            { label: this.$t("menus.home"), to: "/tech-pharmacy/home" },
+            { label: "Início", to: "/tech-pharmacy/home" },
           ]
         },
         {
-          title: this.$t("menus.activeMedications"),
+          title: "Meus Tratamentos",
           menus: [
-            { label: this.$t("menus.activeMedications"), to: "/tech-pharmacy/active-medications" },
+            { label: "Meus Tratamentos", to: "/tech-pharmacy/active-medications" },
+          ]
+        },
+        // >>>>> ALTERAÇÃO AQUI <<<<<
+        {
+          title: "Meu Estoque",
+          menus: [
+            { label: "Meu Estoque", to: "/tech-pharmacy/inventory" },
           ]
         }
       ]
@@ -331,12 +229,19 @@ export default {
 <style scoped>
 ::v-deep .v-toolbar__extension {
   height: 42px !important;
+  padding: 0 !important;
 }
 
-::v-deep .v-tabs-bar {
-  align-items: center
+.hoverable-menu {
+  color: #333;
+  transition: background-color 0.3s;
 }
-::v-deep .v-toolbar__extension {
-  padding: 0 !important;
+
+.hoverable-menu:hover {
+  background-color: #dcdcdc !important;
+}
+
+.router-link-active {
+  background-color: #d0d0d0 !important;
 }
 </style>

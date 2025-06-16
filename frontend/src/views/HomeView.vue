@@ -23,21 +23,43 @@
               <v-row v-else no-gutters class="justify-center">
                 <v-col v-for="medicamento in medicamentos" :key="medicamento.id" cols="12" sm="6" md="4" lg="3"
                   class="pa-2 d-flex">
-                  <v-card class="d-flex flex-column flex-grow-1" @click="viewMedicationDetails(medicamento)" hover
-                    style="cursor: pointer;">
-                    <v-img :src="medicamento.fotoLink" height="200px" contain class="grey lighten-2">
-                      <template v-slot:placeholder>
-                        <v-row class="fill-height ma-0" align="center" justify="center">
-                          <v-icon size="60" color="grey lighten-1">mdi-pill</v-icon>
-                        </v-row>
-                      </template>
-                    </v-img>
-                    <v-card-title class="text-subtitle-1">{{ medicamento.nome }}</v-card-title>
-                    <v-card-text class="text-body-2 flex-grow-1">{{ medicamento.descricao }}</v-card-text>
+                  <v-card class="d-flex flex-column flex-grow-1" hover>
+                    <div @click="viewMedicationDetails(medicamento)" style="cursor: pointer;">
+                      <v-img :src="medicamento.fotoLink" height="200px" contain class="grey lighten-2">
+                        <v-chip
+                          v-if="getStockForBula(medicamento.id).totalPills > 0"
+                          class="ma-2"
+                          color="blue"
+                          text-color="white"
+                          absolute
+                          top
+                          right
+                        >
+                          <v-icon left>mdi-package-variant-closed</v-icon>
+                          {{ getStockForBula(medicamento.id).totalPills }} em estoque
+                        </v-chip>
+                        <template v-slot:placeholder>
+                          <v-row class="fill-height ma-0" align="center" justify="center">
+                            <v-icon size="60" color="grey lighten-1">mdi-pill</v-icon>
+                          </v-row>
+                        </template>
+                      </v-img>
+                      <v-card-title class="text-subtitle-1">{{ medicamento.nome }}</v-card-title>
+                      <v-card-text class="text-body-2 flex-grow-1">{{ medicamento.descricao }}</v-card-text>
+                    </div>
+
+                    <v-spacer></v-spacer>
 
                     <v-card-actions>
+                      <v-btn
+                        text
+                        color="primary"
+                        @click="viewMedicationDetails(medicamento)"
+                      >
+                        <v-icon left>mdi-medical-bag</v-icon>
+                        Tratamento
+                      </v-btn>
                       <v-spacer></v-spacer>
-                      
                       <v-btn
                         color="primary"
                         @click="comprarRemedio(medicamento.id)"
@@ -65,7 +87,7 @@ import {
   useAuthStore,
   useMedicationStore
 } from "../store/index"
-import { mapState, mapActions } from "pinia"
+import { mapState, mapActions, mapGetters } from "pinia"
 import * as utils from "../utils.js"
 
 export default {
@@ -91,13 +113,19 @@ export default {
     ...mapState(useMedicationStore, [
       "getAllMedicamentos"
     ]),
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    ...mapGetters(useMedicationStore, ['getStockForBula']),
     medicamentos() {
       return this.getAllMedicamentos;
     }
   },
   async mounted() {
     this.loading = true;
-    await this.fetchMedicamentos();
+    // >>>>> ALTERAÇÃO AQUI <<<<<
+    await Promise.all([
+      this.fetchMedicamentos(),
+      this.fetchUserStock()
+    ]);
     this.loading = false;
   },
   methods: {
@@ -106,7 +134,9 @@ export default {
     ]),
     ...mapActions(useMedicationStore, [
       "ensureMedicamentosLoaded",
-      "fetchMedicamentos"
+      "fetchMedicamentos",
+      // >>>>> ALTERAÇÃO AQUI <<<<<
+      "fetchUserStock",
     ]),
     viewMedicationDetails(medicamento) {
       this.$router.push({
