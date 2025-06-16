@@ -63,12 +63,17 @@ services:
     build:
       context: .
       dockerfile: ./nginx/Dockerfile
+    container_name: nginx_proxy
     restart: always
     ports:
       - "80:80"
-      - "443:80"
+      # >>> ALTERAÇÃO AQUI: Mapeia a porta 443 da VM para a 443 do contêiner <<<
+      - "443:443" 
     depends_on:
       - backend
+    # >>> NOVO: Compartilha os certificados SSL com o contêiner <<<
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # 'ro' = read-only, mais seguro
 
 volumes:
   sqlserver_data:

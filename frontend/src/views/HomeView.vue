@@ -34,6 +34,18 @@
                     </v-img>
                     <v-card-title class="text-subtitle-1">{{ medicamento.nome }}</v-card-title>
                     <v-card-text class="text-body-2 flex-grow-1">{{ medicamento.descricao }}</v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      
+                      <v-btn
+                        color="primary"
+                        @click="comprarRemedio(medicamento.id)"
+                      >
+                        <v-icon left>mdi-cart-plus</v-icon>
+                        Comprar
+                      </v-btn>
+                    </v-card-actions>
                   </v-card>
                 </v-col>
               </v-row>
@@ -103,6 +115,9 @@ export default {
           id: medicamento.id.toString()
         }
       });
+    },
+    comprarRemedio(id) {
+      this.$router.push({ name: 'PharmacySelection', params: { medicationId: id } })
     },
   }
 }

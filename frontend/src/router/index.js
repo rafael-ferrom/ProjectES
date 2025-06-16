@@ -6,6 +6,7 @@ import LoginView from "./../views/LoginView.vue";
 import HomeView from "./../views/HomeView.vue";
 import DosageConfigurationView from "./../views/DosageConfigurationView.vue";
 import ActiveMedicationsView from "./../views/ActiveMedicationsView.vue";
+import PharmacySelectionView from './../views/PharmacySelectionView.vue';
 import RegisterView from "./../views/RegisterView.vue";
 import NotFoundView from './../views/NotFoundView.vue';
 import { useAuthStore } from "./../store/index";
@@ -61,6 +62,12 @@ const routes = [
         path: "active-medications",
         name: "active-medications",
         component: ActiveMedicationsView,
+      },
+      {
+        path: 'comprar/:medicationId',
+        name: 'PharmacySelection',
+        component: PharmacySelectionView,
+        props: true
       },
     ]
   },

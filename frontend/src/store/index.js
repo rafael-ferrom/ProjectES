@@ -1,3 +1,4 @@
+/* global google */
 import { defineStore } from "pinia"
 import axiosInstance from "@/http.js"
 const axios = axiosInstance
@@ -114,15 +115,20 @@ export const useDisplayStore = defineStore("display", {
 
 export const useMedicationStore = defineStore("medication", {
   state: () => ({
-    medicamentos: [], // Lista mestre de todos os medicamentos disponíveis
+    medicamentos: [],
     selectedMedicationDetails: null,
-    userConfiguredMedicamentos: [], // Novo estado para armazenar os medicamentos configurados pelo usuário
+    userConfiguredMedicamentos: [],
+    nearbyPharmacies: [],
+    isLoadingPharmacies: false,
+    pharmacySearchError: null,
   }),
   getters: {
     getAllMedicamentos: (state) => state.medicamentos,
     getMedicamentoById: (state) => {
       return (id) => state.medicamentos.find((medicamento) => medicamento.id == id);
     },
+    getNearbyPharmacies: (state) => state.nearbyPharmacies,
+    getIsLoadingPharmacies: (state) => state.isLoadingPharmacies,
   },
   actions: {
     transformBulaToMedicamento(bula) {
@@ -194,7 +200,75 @@ export const useMedicationStore = defineStore("medication", {
     async recordDose(medicationId) {
       const url = `/api/medicamentos/${medicationId}/doses`;
       return axios.post(url);
-    }
+    },
+    getCurrentLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Geolocalização não é suportada por este navegador."));
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              });
+            },
+            () => {
+              reject(new Error("Não foi possível obter a localização do usuário."));
+            }
+          );
+        }
+      });
+    },
+    async findNearbyPharmacies() {
+      this.isLoadingPharmacies = true;
+      this.nearbyPharmacies = [];
+      this.pharmacySearchError = null;
+
+      try {
+        // 1. Obter a localização do usuário
+        const userLocation = await this.getCurrentLocation();
+        const center = new google.maps.LatLng(userLocation.lat, userLocation.lng);
+
+        // 2. Preparar a requisição para a API do Places
+        const request = {
+          fields: ['displayName', 'formattedAddress', 'location', 'rating', 'businessStatus'],
+          locationRestriction: {
+            center: center,
+            radius: 5000, // Busca num raio de 5km
+          },
+          includedPrimaryTypes: ['pharmacy'],
+          maxResultCount: 5,
+          rankPreference: 'DISTANCE', // Essencial para ordenar por distância
+          language: 'pt-BR',
+          region: 'br',
+        };
+        
+        // 3. Chamar a API
+        const { places } = await google.maps.places.Place.searchNearby(request);
+
+        // 4. Formatar e salvar o resultado no estado da store
+        if (places.length) {
+          this.nearbyPharmacies = places.map(place => ({
+            id: place.id, // O ID do Google Place
+            name: place.displayName,
+            address: place.formattedAddress,
+            rating: place.rating || 'N/A', // Nem todos os lugares têm avaliação
+            location: {
+              lat: place.location.lat(),
+              lng: place.location.lng(),
+            }
+          }));
+        }
+
+      } catch (error) {
+        console.error("Erro ao buscar farmácias:", error);
+        this.nearbyPharmacies = [];
+        this.pharmacySearchError = error.message;
+      } finally {
+        this.isLoadingPharmacies = false;
+      }
+    },
   },
 });
 
