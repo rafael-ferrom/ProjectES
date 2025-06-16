@@ -10,8 +10,8 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <v-col cols="1" sm="0" md="0" lg="1" xl="1"></v-col>
-            <v-col cols="10" sm="12" md="12" lg="10" xl="10">
+            <!-- <v-col cols="1" sm="0" md="0" lg="1" xl="1"></v-col> -->
+            <v-col cols="10" sm="12" md="12" lg="12" xl="12">
               <v-row v-if="loading" class="justify-center">
                  <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
               </v-row>
@@ -21,9 +21,9 @@
                 </v-alert>
               </v-row>
               <v-row v-else no-gutters class="justify-center">
-                <v-col v-for="medicamento in medicamentos" :key="medicamento.id" cols="12" sm="6" md="4" lg="3"
-                  class="pa-2 d-flex">
-                  <v-card class="d-flex flex-column flex-grow-1" hover>
+                <v-col v-for="medicamento in medicamentos" :key="medicamento.id" cols="12" sm="6" md="6" lg="3"
+                  class="pa-2 d-flex" style="min-width: 310px">
+                  <v-card class="d-flex flex-column flex-grow-1" hover >
                     <div @click="viewMedicationDetails(medicamento)" style="cursor: pointer;">
                       <v-img :src="medicamento.fotoLink" height="200px" contain class="grey lighten-2">
                         <v-chip
@@ -72,7 +72,7 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="1" sm="0" md="0" lg="1" xl="1"></v-col>
+            <!-- <v-col cols="1" sm="0" md="0" lg="1" xl="1"></v-col> -->
           </v-row>
         </div>
       </v-col>
