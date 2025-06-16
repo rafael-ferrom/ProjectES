@@ -1,0 +1,140 @@
+{
+  "hello": "Olá",
+  "instructions": {
+    "logout": "Sair",
+    "ok": "Ok",
+    "close": "Fechar",
+    "login": "Entrar",
+    "next": "Próximo",
+    "back": "Voltar",
+    "sign-in": "Criar conta"
+  },
+  "extras": {
+    "at": "em",
+    "no": "Não",
+    "yes": "Sim",
+    "footer": "© 2023-2024 Tech Pharmacy Todos os direitos reservados.",
+    "language": "Idioma"
+  },
+  "menus": {
+    "home": "Medicações",
+    "activeMedications": "Medicamentos Ativos"
+  },
+  "medication": {
+    "title": "Catálogo de Medicamentos"
+  },
+  "toolbar": {
+    "empresaTrading": "João Silva (demo) | EMPRESA TRADING LTDA",
+    "timeZone": "Fuso Horário: BRT",
+    "title": "Hedge",
+    "errorMessage": "Não foi possível sair. Tente novamente mais tarde."
+  },
+  "requestHelp": {
+    "requestHelp": "Solicitar Ajuda",
+    "greeting": "Olá, como podemos ajudar você?",
+    "instruction": "Selecione como gostaria de receber ajuda de nossos Representantes de Atendimento ao Cliente",
+    "sendEmail": {
+      "title": "Envie-nos um E-mail",
+      "btnText": "Enviar e-mail"
+    },
+    "helpTicket": {
+      "title": "Enviar um ticket de suporte",
+      "description": "Responderemos o mais breve possível",
+      "btnText": "Iniciar ticket (TBR)"
+    },
+    "liveChat": {
+      "title": "Chat ao vivo",
+      "btnText": "Iniciar chat (TBR)"
+    }
+  },
+  "landing": {
+    "title": "Organize sua rotina de remédios",
+    "description": {
+      "descriptionOne": "Cadastre seus medicamentos e defina os horários de cada dose.",
+      "descriptionTwo": "Receba alertas automáticos e acompanhe o andamento do tratamento.",
+      "descriptionThree": "Visualize quanto falta para a próxima dose e quanto já foi concluído.",
+      "descriptionFour": "Tudo em um só lugar, simples e fácil de usar."
+    },
+    "gridPro": {
+      "title": "Registro personalizado de tratamentos",
+      "descriptionOne": "Escolha o remédio que está utilizando e defina o intervalo entre as doses e a duração do tratamento.",
+      "descriptionTwo": "Com poucos cliques, você cria um cronograma personalizado para cada medicamento.",
+      "descriptionThree": "Ideal para pacientes em tratamentos contínuos ou temporários.",
+      "descriptionFour": "Organização simples, visual intuitivo."
+    },
+    "fxMarket": {
+      "title": "Acompanhamento em tempo real",
+      "descriptionOne": "Depois de cadastrar seus medicamentos, acompanhe o tempo restante para a próxima dose.",
+      "descriptionTwo": "Visualize quantos % do tratamento já foi concluído.",
+      "descriptionThree": "Receba lembretes visuais e otimize sua adesão ao tratamento.",
+      "descriptionFour": "Mais autonomia para você ou para quem cuida de você.",
+      "descriptionFive": "Ideal também para cuidadores e profissionais da saúde."
+    },
+    "algorithmic": {
+      "title": "Solução moderna e segura",
+      "descriptionOne": "Nada de anotações soltas ou alarmes confusos:",
+      "descriptionTwo": " nossa plataforma reúne todos os dados do tratamento em um só lugar.",
+      "descriptionThree": "Com design intuitivo e responsivo, ela se adapta ao seu dia a dia.",
+      "descriptionFour": "Leve, rápida, confiável:",
+      "descriptionFive": " sua saúde merece o melhor da tecnologia.",
+      "descriptionSix": "Experimente agora."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "description": {
+      "descriptionOne": "Este é um serviço de autenticação seguro da Tech Pharmacy",
+      "descriptionTwo": "que permite acesso aos serviços Tech Pharmacy",
+      "descriptionThree": "de onde você estiver."
+    },
+    "corporateEmail": "E-mail corporativo",
+    "password": "Senha",
+    "authenticationFail": "Falha na autenticação do usuário: credenciais inválidas"
+  },
+  "register": {
+    "title": "Registrar-se",
+    "fullName": "Nome Completo",
+    "fullNamePlaceholder": "Digite seu nome completo",
+    "email": "Email",
+    "emailPlaceholder": "Digite seu email",
+    "password": "Senha",
+    "passwordPlaceholder": "Digite sua senha",
+    "confirmPassword": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Confirme sua senha",
+    "register": "Cadastrar",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "login": "Login",
+    "authenticationFail": "Falha no cadastro do usuário: credenciais inválidas"
+  },
+  "notFound": {
+    "title": "404 Página não encontrada",
+    "descriptionOne": "Receio que você encontrou uma página que não existe na Tech Pharmacy.",
+    "descriptionTwo": "Isso pode acontecer quando você segue um link para algo que foi excluído.",
+    "descriptionThree": "Ou o link estava incorreto desde o início.",
+    "apologies": "Desculpe por isso."
+  },
+  "activeMedicationsView": {
+    "removeDialogTitle": "Confirmar Remoção",
+    "removeDialogMessage": "Tem certeza de que deseja remover este medicamento da lista ativa?",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "loadLocalStorageComment": "Carrega do localStorage ao montar o componente, se o store ainda não o fez.",
+    "ensureMedicationsLoadedComment": "Garante que os detalhes dos medicamentos base estejam carregados.",
+    "updateNowIntervalComment": "Atualiza 'now' a cada minuto para recalcular os tempos.",
+    "every60SecondsComment": "A cada 60 segundos.",
+    "longMedicationNamesComment": "Para nomes longos de medicamentos",
+    "myActiveMedicines": "Meus Medicamentos Ativos",
+    "noConfiguredMedicine": "Você ainda não configurou nenhum medicamento.",
+    "configureNow": "Configure um agora!",
+    "unknownMedication": "Medicamento Desconhecido",
+    "startDate": "Início",
+    "treatmentProgress": "Progresso do Tratamento ({duration} dias):",
+    "daysProgress": "{daysPassed} de {duration} dias",
+    "treatmentCompleted": "Tratamento Concluído!",
+    "nextDose": "Próxima Dose:",
+    "calculating": "Calculando...",
+    "interval": "Intervalo:",
+    "everyXHours": "A cada {interval} horas.",
+    "userInfo": "Usuário: Idade {age}, Peso {weight}kg. Alergias: {allergies}"
+  }
+}

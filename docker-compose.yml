@@ -1,0 +1,79 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "SuaSenhaForte_123!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-U", "sa", "-P", "SuaSenhaForte_123!", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    # docker run --name sqlserver-dev -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=SuaSenhaForte_123!" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2019-latest # Use the same image to ensure sqlcmd is available
+    depends_on:
+      db:
+        condition: service_healthy # This ensures db-init only runs when 'db' is healthy
+    user: "0"
+    entrypoint: [] # Set entrypoint to a shell
+    command:
+      - "/bin/bash"
+      - "-ec"
+      - |
+        if ! /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P SuaSenhaForte_123! -Q 'select 1' -d ProjectES_DB &>/dev/null; then
+          echo 'Creating the database...'
+          /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P SuaSenhaForte_123! -Q 'create database ProjectES_DB'
+          /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P SuaSenhaForte_123! -Q 'select 1' -d ProjectES_DB >/dev/null
+          echo 'Database created successfully.'
+        else
+          echo 'Database already initialized.'
+        fi
+    # Set to 'no' to ensure this service exits after its command completes successfully
+    # If the command fails, it will not restart.
+    restart: "no"
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    restart: on-failure
+    depends_on:
+      # db:
+      #   condition: service_healthy
+      db-init:
+        condition: service_completed_successfully # Backend starts only after db-init finishes successfully
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=ProjectES_DB;trustServerCertificate=true
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: "SuaSenhaForte_123!"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: true
+      SPRING_SQL_INIT_MODE: always
+    ports:
+      - "8080:8080"
+
+  proxy:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+      # >>> ALTERAÇÃO AQUI: Mapeia a porta 443 da VM para a 443 do contêiner <<<
+      - "443:443" 
+    depends_on:
+      - backend
+    # >>> NOVO: Compartilha os certificados SSL com o contêiner <<<
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # 'ro' = read-only, mais seguro
+
+volumes:
+  sqlserver_data:
