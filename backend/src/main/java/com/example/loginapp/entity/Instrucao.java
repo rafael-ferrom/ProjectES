@@ -22,7 +22,7 @@ public class Instrucao {
 
 	@ManyToOne
     @JoinColumn(name = "medicamento_id")
-    @JsonBackReference // Lado "de volta" da referência - será ignorado na serialização
+    @JsonBackReference
     private Medicamento medicamento;
 
 	public Instrucao() {

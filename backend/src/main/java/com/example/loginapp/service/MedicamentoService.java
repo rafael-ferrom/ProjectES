@@ -14,7 +14,6 @@ public interface MedicamentoService {
     Optional<Medicamento> buscarPorId(Long id);
     void registrarDose(Long medicamentoId);
 
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     List<EstoqueMedicamento> comprarMedicamento(CompraDTO compraDTO);
     List<EstoqueMedicamento> listarEstoquePorUsuario(Long userId);
 }

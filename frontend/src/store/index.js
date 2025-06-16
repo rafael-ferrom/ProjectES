@@ -129,7 +129,6 @@ export const useMedicationStore = defineStore("medication", {
     getMedicamentoById: (state) => {
       return (id) => state.medicamentos.find((medicamento) => medicamento.id == id);
     },
-    // >>>>> NOVO GETTER <<<<<
     getStockForBula: (state) => (bulaId) => {
         const today = new Date().toISOString().slice(0, 10);
         const relevantStock = state.userStock.filter(item => item.bula.id === bulaId && item.status === 'DISPONIVEL' && item.dataValidade >= today);
@@ -150,7 +149,6 @@ export const useMedicationStore = defineStore("medication", {
         nome: `${bula.nomeComercial} ${bula.concentracao}`,
         descricao: `Um medicamento baseado em ${bula.principioAtivo}. Apresentado em uma ${bula.apresentacao.toLowerCase()}.`,
         informacoesDeUso: `Siga as instruções médicas para ${bula.nomeComercial}.`,
-        // >>>>> ALTERAÇÃO AQUI <<<<<
         comprimidosPorCaixa: parseInt(bula.apresentacao.match(/\d+/)[0], 10) || 20 // Extrai número de comprimidos
       };
     },
@@ -213,20 +211,16 @@ export const useMedicationStore = defineStore("medication", {
     },
     async recordDose(medicationId) {
       const url = `/api/medicamentos/${medicationId}/doses`;
-      // A chamada ao backend não muda, mas vamos atualizar o estoque depois
       try {
         const response = await axios.post(url);
-        // Após registrar a dose, buscar o estoque e os tratamentos novamente para refletir as mudanças
         await this.fetchUserStock();
         await this.fetchUserConfiguredMedicamentos();
         return response;
       } catch (error) {
         console.error("Erro ao registrar dose:", error.response?.data || error.message);
-        // Propaga o erro para que a view possa tratá-lo (ex: mostrar snackbar)
         throw new Error(error.response?.data?.message || "Não foi possível registrar a dose. Verifique seu estoque.");
       }
     },
-    // >>>>> NOVA AÇÃO <<<<<
     async fetchUserStock() {
         const authStore = useAuthStore();
         const userId = authStore.userId;
@@ -242,7 +236,6 @@ export const useMedicationStore = defineStore("medication", {
             this.userStock = [];
         }
     },
-    // >>>>> NOVA AÇÃO <<<<<
     async purchaseMedication(purchasePayload) {
         const authStore = useAuthStore();
         if (!authStore.userId) {
@@ -288,34 +281,30 @@ export const useMedicationStore = defineStore("medication", {
       this.pharmacySearchError = null;
 
       try {
-        // 1. Obter a localização do usuário
         const userLocation = await this.getCurrentLocation();
         const center = new google.maps.LatLng(userLocation.lat, userLocation.lng);
 
-        // 2. Preparar a requisição para a API do Places
         const request = {
           fields: ['displayName', 'formattedAddress', 'location', 'rating', 'businessStatus'],
           locationRestriction: {
             center: center,
-            radius: 5000, // Busca num raio de 5km
+            radius: 5000,
           },
           includedPrimaryTypes: ['pharmacy'],
           maxResultCount: 5,
-          rankPreference: 'DISTANCE', // Essencial para ordenar por distância
+          rankPreference: 'DISTANCE',
           language: 'pt-BR',
           region: 'br',
         };
         
-        // 3. Chamar a API
         const { places } = await google.maps.places.Place.searchNearby(request);
 
-        // 4. Formatar e salvar o resultado no estado da store
         if (places.length) {
           this.nearbyPharmacies = places.map(place => ({
-            id: place.id, // O ID do Google Place
+            id: place.id,
             name: place.displayName,
             address: place.formattedAddress,
-            rating: place.rating || 'N/A', // Nem todos os lugares têm avaliação
+            rating: place.rating || 'N/A',
             location: {
               lat: place.location.lat(),
               lng: place.location.lng(),
@@ -413,13 +402,11 @@ export const useNotificationStore = defineStore("notification", {
     },
     async addNotification(notificationData) {
       const authStore = useAuthStore();
-      // Salva no backend
       try {
         const payload = { ...notificationData, userId: authStore.userId };
         const response = await axios.post('/api/notificacoes', payload);
-        this.notifications.unshift(response.data); // Adiciona no início da lista local
+        this.notifications.unshift(response.data);
         
-        // Mostra o snackbar
         this.snackbar.text = notificationData.mensagem;
         this.snackbar.color = notificationData.tipo === 'DOSE_ATRASADA' ? 'warning' : 'info';
         this.snackbar.show = true;

@@ -147,7 +147,7 @@ export default {
       const isCurrentRoute = menuList.some(menu => menu.to === this.$route.path)
 
       if (isCurrentRoute) {
-        return { borderBottom: '5px solid #1976D2' } // Usando a cor primária do Vuetify
+        return { borderBottom: '5px solid #1976D2' }
       }
 
       return {}

@@ -128,20 +128,15 @@ export default {
   methods: {
     submitUserInfo() {
       if (this.$refs.userInfoForm.validate()) {
-        // console.log('Informações do usuário válidas:', this.userInfo);
-        // console.log('Medicamento selecionado ID:', this.id);
-
-        // Navegar para a tela de configuração de dosagem
         this.$router.push({
-          name: 'dosage-configuration', // Nome da rota definida em router.js
+          name: 'dosage-configuration',
           params: {
-            id: this.id, // Passa o ID do medicamento (já é parte da URL da nova rota)
-            userInfo: this.userInfo // Passa o objeto com dados do usuário
+            id: this.id,
+            userInfo: this.userInfo
           }
         });
       } else {
-        // alert('Por favor, corrija os erros no formulário.');
-        this.$vuetify.goTo(0); // Rola para o topo para ver os erros de validação
+        this.$vuetify.goTo(0)
       }
     }
   }
@@ -149,17 +144,12 @@ export default {
 </script>
 
 <style scoped>
-.headline.font-weight-bold.primary--text {
-  /* Se quiser usar a cor primária do seu tema Vuetify */
-  /* color: var(--v-primary-base); */
-}
 
 .text-center.d-block {
   display: block;
   text-align: center;
 }
 
-/* Adicionar um pouco mais de espaço se necessário */
 .v-card__text h3 {
   margin-top: 8px;
 }

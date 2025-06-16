@@ -1,7 +1,7 @@
 package com.example.loginapp.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime; // Import LocalDateTime
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,8 +29,6 @@ public class Frequencia {
     this.dataTermino = dataTermino;
     this.vezesPorDia = vezesPorDia;
   }
-
-  // Getters and Setters for all fields...
   
   public Long getId() {
     return id;

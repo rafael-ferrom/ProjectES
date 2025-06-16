@@ -1,58 +1,83 @@
-# 🩺 Sistema de Gerenciamento de Medicamentos
+# Tech Pharmacy: Sistema de Gestão de Medicamentos 🩺
 
-Este é um projeto de uma API REST desenvolvida com **Spring Boot** e banco de dados **H2**, com o objetivo de realizar o gerenciamento de medicamentos de usuários, incluindo dados sobre bula, frequência e instruções de uso.
+Tech Pharmacy é uma aplicação Full Stack projetada para empoderar pacientes e cuidadores na gestão de tratamentos médicos. A plataforma oferece uma interface simples e inteligente para controlar medicamentos, horários, estoque e informações relevantes, garantindo segurança e aumentando a adesão ao tratamento.
+
+O projeto é composto por uma API RESTful robusta desenvolvida com Spring Boot e um frontend reativo construído com Vue.js. Todo o ambiente é containerizado com Docker, garantindo uma configuração e execução simples e consistente.
+
+## ⚕️ Gestão de Tratamentos: Cadastro de medicamentos com definição de dosagem, frequência e duração.
+
+- 📦 Controle de Estoque e Validade: Gerenciamento de caixas de remédios, com contagem de comprimidos e alertas sobre a data de validade.
+- 🔔 Sistema de Notificações: Lembretes proativos para doses próximas e alertas para doses esquecidas, com um painel de histórico.
+- ℹ️ Consulta de Bulas: Um catálogo de medicamentos com informações detalhadas, incluindo princípio ativo, fabricante e foto.
+- 🛒 Localização de Farmácias: Ferramenta integrada com a API do Google Maps para encontrar farmácias próximas.
+- 👤 Autenticação de Usuários: Sistema de registro e login para gerenciamento de perfis individuais.
 
 ## 🚀 Tecnologias Utilizadas
 
-- Java 17
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- H2 Database
-- Maven
+- Backend	Java 17, Spring Boot, Spring Data JPA, Spring Security, Maven
+- Frontend	Vue.js (Vue 2), Vuetify, Pinia (State Management), Axios
+- Banco de Dados	Microsoft SQL Server
+- Infraestrutura	Docker, Docker Compose, Nginx (Reverse Proxy)
 
-## 📂 Estrutura do Projeto
+## 🏛️ Arquitetura do Sistema
 
-O projeto está organizado nos seguintes pacotes:
+A aplicação segue uma arquitetura moderna com serviços desacoplados, facilitando a manutenção e escalabilidade.
 
-- `controller` – Camada de controle da API REST.
-- `service` – Lógica de negócios da aplicação.
-- `repository` – Interfaces de persistência com Spring Data JPA.
-- `entity` – Representações das tabelas do banco de dados.
-- `dto` – Objetos de transferência de dados (Data Transfer Object).
+- Nginx: Atua como proxy reverso, direcionando o tráfego do usuário. Requisições para a API (/api/*) são encaminhadas para o Backend, enquanto as demais são atendidas pelo Frontend.
+- Frontend (Vue.js): Interface do usuário interativa que consome os dados da API Backend.
+- Backend (Spring Boot): Expõe a API RESTful, contém toda a lógica de negócio e se comunica com o banco de dados.
+- Banco de Dados (SQL Server): Armazena todos os dados da aplicação de forma persistente.
 
-## 🧠 Funcionalidades
+## 🚀 Como Executar o Projeto (Com Docker)
+A maneira mais simples e recomendada de executar o projeto é utilizando Docker e Docker Compose, que gerenciam todo o ambiente para você.
 
-### Usuários (`/api/users`)
-- `POST /register` – Registro de novo usuário.
-- `POST /login` – Login com e-mail e senha.
+Pré-requisitos
+- Docker
+- Docker Compose (geralmente já vem com o Docker Desktop)
+Passos:
 
-### Medicamentos (`/api/medicamentos`)
-- `POST /` – Cadastra um novo medicamento com frequência, bula e instruções.
-- `GET /usuario/{userId}` – Lista os medicamentos de um usuário específico.
-- `GET /{id}` – Retorna os detalhes de um medicamento por ID.
-- `GET /{id}/frequencia` – Retorna a frequência de um medicamento.
-- `GET /{id}/bula` – Retorna a bula do medicamento.
-- `GET /{id}/instrucoes` – Retorna as instruções de uso do medicamento.
+### Clone este repositório para a sua máquina local:
 
-### Bulas (`/api/bulas`)
-- `GET /` – Lista todas as bulas cadastradas.
-- `GET /{id}` – Retorna os detalhes de uma bula por ID.
+```Bash
 
-## 🧪 DTOs
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio
+```
+A partir da raiz do projeto, execute o seguinte comando para construir as imagens e iniciar os contêineres:
 
-- `UserDTO`: para autenticação e registro.
-- `MedicamentoDTO`: inclui informações sobre o medicamento, bula, frequência e instruções.
-- `FrequenciaDTO`: datas e número de vezes ao dia.
-- `BulaDTO`: instruções da bula.
+```Bash
+docker compose up --build
+```
+Após a conclusão do build, a aplicação estará disponível nos seguintes endereços:
 
-## 🛠️ Como Rodar o Projeto
+Aplicação Frontend: http://localhost
+API Backend: http://localhost/api (acessível através do proxy Nginx)
 
-### Pré-requisitos
-- JDK 17+
-- Maven
+## 📖 Endpoints da API
 
-### Passos
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
+Usuários (/api/users)
+- POST /register: Registro de novo usuário.
+- POST /login: Login com e-mail e senha.
+- Tratamentos (/api/medicamentos)
+- `POST /`: Cadastra um novo plano de tratamento para um usuário.
+- `GET /usuario/{userId}`: Lista os tratamentos de um usuário específico.
+- `POST /{id}/doses`: Registra que uma dose de um tratamento foi tomada.
+- `Estoque (/api/estoque)`
+- `POST /comprar`: Adiciona uma ou mais caixas de um medicamento ao estoque do usuário.
+- `GET /usuario/{userId}`: Lista todos os itens de estoque de um usuário.
+- `Notificações (/api/notificacoes)`
+- `POST /`: Salva uma nova notificação gerada pelo frontend.
+- `GET /usuario/{userId}`: Retorna o histórico de notificações de um usuário.
+- `POST /marcar-como-lidas`: Marca uma lista de notificações como lidas.
+- `Bulas (/api/bulas)`
+- `GET /`: Lista todas as bulas (medicamentos base) cadastradas no sistema.
+- `GET /{id}`: Retorna os detalhes de uma bula por ID.
+
+## 📂 Estrutura do Backend
+
+- config: Classes de configuração (Ex: Spring Security).
+- controller: Camada de controle da API REST, responsável por receber as requisições HTTP.
+- dto: Objetos de Transferência de Dados (Data Transfer Objects) para a comunicação entre camadas.
+- entity: Classes que representam as tabelas do banco de dados (JPA Entities).
+- repository: Interfaces de persistência de dados com Spring Data JPA.
+- service: Camada onde reside a lógica de negócios da aplicação.

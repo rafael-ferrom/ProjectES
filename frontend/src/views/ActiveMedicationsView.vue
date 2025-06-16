@@ -147,7 +147,6 @@ export default {
   },
   computed: {
     ...mapState(useMedicationStore, ['userConfiguredMedicamentos']),
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     ...mapGetters(useMedicationStore, ['getStockForBula']),
 
     processedMedications() {
@@ -176,7 +175,6 @@ export default {
         const dosesTaken = med.doses.length;
         const doseProgress = totalDosesInTreatment > 0 ? (dosesTaken / totalDosesInTreatment) * 100 : 0;
         
-        // >>>>> NOVA LÓGICA DE ESTOQUE <<<<<
         const stockInfo = this.getStockForBula(med.bula.id);
         const hasStock = stockInfo.totalPills > 0;
         const currentBox = stockInfo.boxes.sort((a,b) => new Date(a.dataValidade) - new Date(b.dataValidade))[0];
@@ -188,7 +186,7 @@ export default {
             const totalBoxes = stockInfo.boxes.length;
             stockMessage = `${stockInfo.totalPills} comprimidos em ${totalBoxes} caixa(s).`;
             alertType = 'success';
-            if (stockInfo.totalPills < med.frequencia.vezesPorDia * 3) { // Aviso de estoque baixo (ex: < 3 dias)
+            if (stockInfo.totalPills < med.frequencia.vezesPorDia * 3) {
                 alertType = 'warning';
                 stockMessage += ' (Estoque baixo!)';
             }
@@ -222,19 +220,17 @@ export default {
     }
   },
   methods: {
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     ...mapActions(useMedicationStore, ['fetchUserConfiguredMedicamentos', 'recordDose', 'fetchUserStock']),
     
     async handleRecordDose(medicationId) {
         const med = this.processedMedications.find(m => m.id === medicationId);
         if (!med) return;
         
-        med.isRecording = true; // Usa a propriedade computada para o feedback de loading
+        med.isRecording = true;
         
         try {
             await this.recordDose(medicationId);
             this.snackbar = { show: true, text: 'Dose registrada com sucesso!', color: 'success' };
-            // Os dados já são atualizados dentro da ação `recordDose` na store
         } catch (error) {
             console.error("Failed to record dose:", error);
             this.snackbar = { show: true, text: error.message || "Erro ao registrar dose.", color: 'error' };
@@ -245,9 +241,8 @@ export default {
 
     formatDateTime(dateString) {
       if (!dateString) return 'N/A';
-      const date = new Date(dateString + 'Z'); // Adiciona 'Z' para indicar que a string é UTC
+      const date = new Date(dateString + 'Z');
       
-      // >>>>> CORREÇÃO AQUI <<<<<
       return new Intl.DateTimeFormat('pt-BR', {
         timeZone: 'America/Sao_Paulo',
         year: '2-digit', month: '2-digit', day: '2-digit',
@@ -257,19 +252,16 @@ export default {
     
     formatDate(dateString) {
       if (!dateString) return 'N/A';
-      // Para datas sem hora, precisamos adicionar a hora para evitar problemas de fuso
       const date = new Date(dateString + 'T00:00:00Z');
       
-      // >>>>> CORREÇÃO AQUI <<<<<
       return new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Sao_Paulo', // Garante que a data seja interpretada corretamente
+        timeZone: 'America/Sao_Paulo',
         year: 'numeric', month: 'long', day: 'numeric'
       }).format(date);
     }
   },
   async mounted() {
     this.loading = true;
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     await Promise.all([
         this.fetchUserConfiguredMedicamentos(),
         this.fetchUserStock()

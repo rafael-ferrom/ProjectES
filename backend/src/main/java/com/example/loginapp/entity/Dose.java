@@ -26,23 +26,20 @@ public class Dose {
     @JsonBackReference
     private Medicamento medicamento;
     
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     @ManyToOne
-    @JoinColumn(name = "estoque_id", nullable = true) // Nullable por enquanto para não quebrar dados antigos
+    @JoinColumn(name = "estoque_id", nullable = true)
     private EstoqueMedicamento estoqueMedicamento;
 
 
     public Dose() {
     }
 
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     public Dose(Medicamento medicamento, EstoqueMedicamento estoqueMedicamento) {
         this.medicamento = medicamento;
         this.estoqueMedicamento = estoqueMedicamento;
         this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
     }
     
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -67,7 +64,6 @@ public class Dose {
         this.medicamento = medicamento;
     }
 
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     public EstoqueMedicamento getEstoqueMedicamento() {
         return estoqueMedicamento;
     }

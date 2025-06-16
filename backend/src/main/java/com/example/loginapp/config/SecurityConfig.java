@@ -19,15 +19,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Aplica a configuração de CORS
             .cors(withDefaults())
-            // Desabilita a proteção CSRF
             .csrf(csrf -> csrf.disable())
 
-            // Configura as regras de autorização
             .authorizeHttpRequests(auth -> auth
-                // >>>>> ALTERAÇÃO PRINCIPAL AQUI <<<<<
-                // Permite TODAS as requisições sem autenticação.
                 .anyRequest().permitAll()
             );
 
@@ -37,15 +32,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite requisições da URL do seu frontend
         configuration.setAllowedOrigins(List.of("https://techpharmacy.bounceme.net", "http://localhost:8081"));
-        // Permite os métodos HTTP mais comuns
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Permite cabeçalhos HTTP comuns
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplica esta configuração a todas as rotas da sua API
         source.registerCorsConfiguration("/api/**", configuration);
         
         return source;

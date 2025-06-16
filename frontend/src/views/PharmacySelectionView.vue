@@ -151,8 +151,7 @@ export default {
       dialogConfirmacao: false,
       dialogSucesso: false,
       farmaciaSelecionada: null,
-      map: null, // Guarda a instância do mapa
-      // >>>>> ALTERAÇÃO AQUI <<<<<
+      map: null,
       isPurchasing: false,
       snackbar: { show: false, text: '', color: '' },
     };
@@ -166,17 +165,14 @@ export default {
     }),
     ...mapGetters(useMedicationStore, ['getMedicamentoById', 'getStockForBula']),
     medicamento() {
-      // Usa o getter para encontrar o medicamento da lista geral
       return this.getMedicamentoById(this.medicationId);
     },
-    // >>>>> NOVO COMPUTED <<<<<
     currentStock() {
         if (!this.medicamento) return { totalPills: 0, boxes: [] };
         return this.getStockForBula(this.medicamento.id);
     }
   },
   methods: {
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     ...mapActions(useMedicationStore, ['findNearbyPharmacies', 'fetchMedicamentos', 'purchaseMedication', 'fetchUserStock']),
 
     abrirDialogConfirmacao(farmacia) {
@@ -188,9 +184,8 @@ export default {
         const payload = {
             bulaId: this.medicamento.id,
             numeroDeCaixas: this.quantidade,
-            // A quantidade de comprimidos é extraída da bula/medicamento
             comprimidosPorCaixa: this.medicamento.comprimidosPorCaixa,
-            validadeEmAnos: 2, // Hardcoded conforme solicitado
+            validadeEmAnos: 2,
         };
 
         try {
@@ -252,7 +247,6 @@ export default {
   async mounted() {
     this.isPageLoading = true;
     
-    // >>>>> ALTERAÇÃO AQUI <<<<<
     await Promise.all([
         this.medicamentos.length === 0 ? this.fetchMedicamentos() : Promise.resolve(),
         this.fetchUserStock(),
