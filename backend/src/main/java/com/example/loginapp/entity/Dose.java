@@ -1,6 +1,7 @@
 package com.example.loginapp.entity;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,7 +39,7 @@ public class Dose {
     public Dose(Medicamento medicamento, EstoqueMedicamento estoqueMedicamento) {
         this.medicamento = medicamento;
         this.estoqueMedicamento = estoqueMedicamento;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneOffset.UTC);
     }
     
     // Getters and Setters

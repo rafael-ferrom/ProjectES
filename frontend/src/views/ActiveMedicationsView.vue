@@ -245,14 +245,26 @@ export default {
 
     formatDateTime(dateString) {
       if (!dateString) return 'N/A';
-      const options = { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-      return new Date(dateString).toLocaleString('pt-BR', options);
+      const date = new Date(dateString + 'Z'); // Adiciona 'Z' para indicar que a string é UTC
+      
+      // >>>>> CORREÇÃO AQUI <<<<<
+      return new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        year: '2-digit', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).format(date);
     },
     
     formatDate(dateString) {
       if (!dateString) return 'N/A';
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', options);
+      // Para datas sem hora, precisamos adicionar a hora para evitar problemas de fuso
+      const date = new Date(dateString + 'T00:00:00Z');
+      
+      // >>>>> CORREÇÃO AQUI <<<<<
+      return new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo', // Garante que a data seja interpretada corretamente
+        year: 'numeric', month: 'long', day: 'numeric'
+      }).format(date);
     }
   },
   async mounted() {

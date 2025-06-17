@@ -107,8 +107,14 @@ export default {
     ...mapActions(useMedicationStore, ['fetchUserStock']),
     formatDate(dateString) {
       if (!dateString) return 'N/A';
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString + 'T00:00:00').toLocaleDateString('pt-BR', options);
+      // Para datas sem hora, precisamos adicionar a hora para evitar problemas de fuso
+      const date = new Date(dateString + 'T00:00:00Z');
+
+      // >>>>> CORREÇÃO AQUI <<<<<
+      return new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo', // Garante que a data seja interpretada corretamente
+        year: 'numeric', month: 'long', day: 'numeric'
+      }).format(date);
     },
     getExpiryColor(dateString) {
       const today = new Date();

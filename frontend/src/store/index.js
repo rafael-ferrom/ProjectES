@@ -380,3 +380,68 @@ export const useActiveMedicationsStore = defineStore("activeMedications", {
     },
   },
 });
+
+export const useNotificationStore = defineStore("notification", {
+  state: () => ({
+    notifications: [],
+    isDrawerOpen: false,
+    snackbar: {
+      show: false,
+      text: '',
+      color: 'info',
+    }
+  }),
+  getters: {
+    unreadCount: (state) => state.notifications.filter(n => !n.lida).length,
+  },
+  actions: {
+    toggleDrawer() {
+      this.isDrawerOpen = !this.isDrawerOpen;
+      if(this.isDrawerOpen && this.unreadCount > 0) {
+        this.markAllAsRead();
+      }
+    },
+    async fetchNotifications() {
+      const authStore = useAuthStore();
+      if (!authStore.userId) return;
+      try {
+        const response = await axios.get(`/api/notificacoes/usuario/${authStore.userId}`);
+        this.notifications = response.data;
+      } catch (error) {
+        console.error("Erro ao buscar notificações:", error);
+      }
+    },
+    async addNotification(notificationData) {
+      const authStore = useAuthStore();
+      // Salva no backend
+      try {
+        const payload = { ...notificationData, userId: authStore.userId };
+        const response = await axios.post('/api/notificacoes', payload);
+        this.notifications.unshift(response.data); // Adiciona no início da lista local
+        
+        // Mostra o snackbar
+        this.snackbar.text = notificationData.mensagem;
+        this.snackbar.color = notificationData.tipo === 'DOSE_ATRASADA' ? 'warning' : 'info';
+        this.snackbar.show = true;
+
+      } catch (error) {
+        console.error("Erro ao salvar notificação:", error);
+      }
+    },
+    async markAllAsRead() {
+      const unreadIds = this.notifications.filter(n => !n.lida).map(n => n.id);
+      if (unreadIds.length === 0) return;
+      
+      try {
+        await axios.post('/api/notificacoes/marcar-como-lidas', unreadIds);
+        this.notifications.forEach(n => {
+          if (unreadIds.includes(n.id)) {
+            n.lida = true;
+          }
+        });
+      } catch (error) {
+        console.error("Erro ao marcar notificações como lidas:", error);
+      }
+    },
+  }
+});

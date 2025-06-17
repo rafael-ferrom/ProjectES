@@ -1,5 +1,6 @@
+
 <template>
-  <v-app-bar
+    <v-app-bar
     app
     :height="115"
     color="white"
@@ -37,66 +38,28 @@
           </div>
         </div>
 
-        <v-menu
-          open-on-hover
-          bottom
-          offset-y
-        >
-          <v-list>
-            <v-list-item link @click="changeLanguage('en')">
-              <v-img
-                style="height: 32px;"
-                content-class="rounded-lg"
-                class="rounded-lg mr-2"
-                aspect-ratio="16/9"
-                max-width="32"
-                width="32"
-                :src="require(`./../assets/usd_flag.png`)"
-              />
-              <v-list-item-title>
-                EN-US
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item link @click="changeLanguage('pt')">
-              <v-img
-                style="height: 32px;"
-                content-class="rounded-lg"
-                class="rounded-lg mr-2"
-                aspect-ratio="16/9"
-                max-width="32"
-                width="32"
-                :src="require(`./../assets/brazil_flag.png`)"
-              />
-              <v-list-item-title>
-                PT-BR
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <v-spacer></v-spacer>
 
-        <v-menu
-          open-on-hover
-          bottom
-          offset-y
-        >
+        <v-btn class="my-auto ml-5" icon @click="toggleDrawer">
+          <v-badge
+            :content="unreadCount"
+            :value="unreadCount"
+            color="red"
+            overlap
+          >
+            <v-icon>mdi-bell</v-icon>
+          </v-badge>
+        </v-btn>
+
+        <v-menu open-on-hover bottom offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              class="my-auto ml-5"
-              v-bind="attrs"
-              v-on="on"
-              icon
-            >
-              <v-icon>
-                mdi-account
-              </v-icon>
+            <v-btn class="my-auto ml-5" v-bind="attrs" v-on="on" icon>
+              <v-icon>mdi-account</v-icon>
             </v-btn>
           </template>
-
           <v-list>
             <v-list-item link @click="logoutClicked()">
-              <v-list-item-title>
-                {{ $t('instructions.logout') }}
-              </v-list-item-title>
+              <v-list-item-title>{{ $t('instructions.logout') }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -142,8 +105,8 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapWritableState } from "pinia"
-import { useAuthStore } from "./../store/index"
+import { mapActions, mapState, mapWritableState } from "pinia";
+import { useAuthStore, useNotificationStore } from "./../store/index";
 
 export default {
   components: {
@@ -175,6 +138,7 @@ export default {
       "removeSessionLocalStorage",
       "getUserRoleFromLocalStorage"
     ]),
+    ...mapActions(useNotificationStore, ["toggleDrawer"]),
     logoutClicked() {
       this.logout()
       this.$router.push("/")
@@ -196,6 +160,7 @@ export default {
     ...mapState(useAuthStore, [
       "authenticated"
     ]),
+    ...mapState(useNotificationStore, ["unreadCount"]),
     isPtBRLocale() {
       return this.$i18n.locale === "pt"
     },
